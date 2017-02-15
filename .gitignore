@@ -1,0 +1,5 @@
+builds/
+GLEngine/Release/
+GLEngine/Debug/
+*.opendb
+*.db
