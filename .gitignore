@@ -3,3 +3,4 @@ GLEngine/Release/
 GLEngine/Debug/
 *.opendb
 *.db
+*.suo
