@@ -1,29 +1,37 @@
 #pragma once
 
-#include <glm/glm.hpp>
+class ApplicationBase;
+namespace GLE {
+	static ApplicationBase* APP = nullptr;
+}
 
 struct GLFWwindow;
 
 class ApplicationBase
 {
 public:
-	ApplicationBase();
+	ApplicationBase(int _windowWidth, int _windowHeight);
 	virtual ~ApplicationBase();
 
 	void Run();
-	virtual int Startup();
-	virtual int Update();
-	virtual int Draw();
-	virtual int Shutdown();
+	// Run Calls
+	virtual int Start() { return 0; }
+	virtual int FixedUpdate(double _deltaTime) { return 0; }
+	virtual int Update(double _deltaTime) { return 0; }
+	virtual int LateUpdate(double _deltaTime) { return 0; }
+	virtual int Draw() { return 0; }
+	virtual int Shutdown() { return 0; }
 
-	inline void ERROR_MSG(const char* _msg);
+	inline static void ERROR_MSG(const char* _msg);
 
+	int GetWindowWidth();
+	int GetWindowHeight();
+	void GetOGLVersion(int& _outMajor, int& _outMinor);
+
+protected:
 	int m_windowWidth;
 	int m_windowHeight;
 	int m_GLMajor;
 	int m_GLMinor;
 	GLFWwindow* m_window;
-	glm::mat4 m_view;
-	glm::mat4 m_projection;
 };
-

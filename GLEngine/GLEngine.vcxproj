@@ -160,11 +160,13 @@
   <ItemGroup>
     <ClCompile Include="..\deps\gl_core_4_4\gl_core_4_4.c" />
     <ClCompile Include="ApplicationBase.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Gizmos.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationBase.h" />
+    <ClInclude Include="Camera.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

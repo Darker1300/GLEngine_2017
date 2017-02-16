@@ -14,7 +14,7 @@
 
 int main()
 {
-	ApplicationBase* app = new ApplicationBase();
+	ApplicationBase* app = new ApplicationBase(1280, 720);
 	app->Run();
 	delete app;
 
