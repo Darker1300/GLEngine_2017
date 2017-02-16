@@ -160,13 +160,22 @@
   <ItemGroup>
     <ClCompile Include="..\deps\gl_core_4_4\gl_core_4_4.c" />
     <ClCompile Include="ApplicationBase.cpp" />
+    <ClCompile Include="ApplicationDemo.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Gizmos.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="ShaderProgram.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationBase.h" />
+    <ClInclude Include="ApplicationDemo.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="Shaders1.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

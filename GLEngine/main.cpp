@@ -1,22 +1,25 @@
-//#include <gl_core_4_4.h>
-//#include <GlFW/glfw3.h>
-//
-//#include <iostream>
-//#include <glm/glm.hpp>
-//#include <glm/ext.hpp>
-//#include "Gizmos.h"
+#ifdef _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif
 
-//#if defined(_WINDOWS_) && defined(_DEBUG)
-//#include <Windows.h>
-//#endif
-
-#include "ApplicationBase.h"
+#include "ApplicationDemo.h"
 
 int main()
 {
-	ApplicationBase* app = new ApplicationBase(1280, 720);
-	app->Run();
+#if _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
+	ApplicationBase* app = new ApplicationDemo();
+	app->Run(1280, 720);
 	delete app;
+
+#if _DEBUG
+	_CrtDumpMemoryLeaks();
+#endif
 
 	return 0;
 }
