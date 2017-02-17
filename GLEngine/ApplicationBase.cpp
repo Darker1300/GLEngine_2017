@@ -1,13 +1,5 @@
-#ifdef _DEBUG
-#define _CRTDBG_MAP_ALLOC  
-#include <crtdbg.h> 
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
-#endif
-
-#if defined(_WINDOWS_) && defined(_DEBUG)
-#include <Windows.h>
-#endif
+#include "DEGUG_NEW_LEAK_DETECT.h"
+#include "DEBUG_WINDOWS_ERR_MSG.h"
 
 #include "ApplicationBase.h"
 
@@ -15,18 +7,21 @@
 #include <GlFW/glfw3.h>
 #include <iostream>
 
-ApplicationBase::ApplicationBase()
+ApplicationBase* GLE::APP = nullptr;
+
+ApplicationBase::ApplicationBase(std::string _title, int _width, int _height)
 {
+	m_windowTitle = _title;
+	m_windowWidth = _width;
+	m_windowHeight = _height;
 }
 
 ApplicationBase::~ApplicationBase()
 {
 }
 
-void ApplicationBase::Run(int _windowWidth, int _windowHeight)
+void ApplicationBase::Run()
 {
-	m_windowWidth = _windowWidth;
-	m_windowHeight = _windowHeight;
 
 	static double second = 1.0;
 	m_targetFPS = 60.0;
@@ -37,11 +32,11 @@ void ApplicationBase::Run(int _windowWidth, int _windowHeight)
 	int currentFPS = 0, fixedUpdates = 0;
 
 	// PreInitialise Event
-	if (PreInitialise() != 0) { ERROR_MSG("ApplicationBase.PreInitialise Failed."); }
+	if (PreInitialise() != 0) { DEBUG::ERROR_MSG("ApplicationBase.PreInitialise Failed."); }
 	// Initialise Event
-	if (Initialise() != 0) { ERROR_MSG("ApplicationBase.Initialise Failed."); }
+	if (Initialise() != 0) { DEBUG::ERROR_MSG("ApplicationBase.Initialise Failed."); }
 	// Start Event
-	if (Start() != 0) { ERROR_MSG("ApplicationBase.Start Failed."); }
+	if (Start() != 0) { DEBUG::ERROR_MSG("ApplicationBase.Start Failed."); }
 
 	// While window is alive
 	while (glfwWindowShouldClose(m_window) == false)
@@ -58,19 +53,19 @@ void ApplicationBase::Run(int _windowWidth, int _windowHeight)
 		// Only FixedUpdate at fixed frames / s
 		while (fixedDeltaTime >= second) {
 			// FixedUpdate Event
-			if (FixedUpdate(m_fixedDTInterval) != 0) { ERROR_MSG("ApplicationBase.FixedUpdate Failed."); }
-			
+			if (FixedUpdate(m_fixedDTInterval) != 0) { DEBUG::ERROR_MSG("ApplicationBase.FixedUpdate Failed."); }
+
 			// Measure timing
 			fixedUpdates++;
 			fixedDeltaTime -= second;
 		}
 		// Update Event
-		if (Update(deltaTime) != 0) { ERROR_MSG("ApplicationBase.Update Failed."); }
+		if (Update(deltaTime) != 0) { DEBUG::ERROR_MSG("ApplicationBase.Update Failed."); }
 		// LateUpdate Event
-		if (LateUpdate(deltaTime) != 0) { ERROR_MSG("ApplicationBase.LateUpdate Failed."); }
+		if (LateUpdate(deltaTime) != 0) { DEBUG::ERROR_MSG("ApplicationBase.LateUpdate Failed."); }
 
 		// Draw Event, at maximum possible frames
-		if (Draw() != 0) { ERROR_MSG("ApplicationBase.Draw Failed."); }
+		if (Draw() != 0) { DEBUG::ERROR_MSG("ApplicationBase.Draw Failed."); }
 
 		// Double Buffer
 		glfwSwapBuffers(m_window);
@@ -90,59 +85,67 @@ void ApplicationBase::Run(int _windowWidth, int _windowHeight)
 		}
 	}
 	// Shutdown Event
-	if (Shutdown() != 0) { ERROR_MSG("ApplicationBase.Shutdown Failed."); }
+	if (Shutdown() != 0) { DEBUG::ERROR_MSG("ApplicationBase.Shutdown Failed."); }
 	// Finalise Event
-	if (Finalise() != 0) { ERROR_MSG("ApplicationBase.Finalise Failed."); }
+	if (Finalise() != 0) { DEBUG::ERROR_MSG("ApplicationBase.Finalise Failed."); }
+}
+
+int ApplicationBase::PreInitialise()
+{
+	GLE::APP = this;
+	return 0;
 }
 
 int ApplicationBase::Initialise()
 {
-	InitialiseWindow();
+	CreateOGLWindow();
 	return 0;
 }
 
 int ApplicationBase::Finalise()
 {
-	FinaliseWindow();
+	DestroyOGLWindow();
+	GLE::APP = nullptr;
 	return 0;
 }
 
-inline void ApplicationBase::ERROR_MSG(const char * _msg) {
-#if defined(_WINDOWS_) && defined(_DEBUG)
-	MessageBox(NULL, _msg, "ERROR", MB_ICONERROR);
-#endif
-}
-
-void ApplicationBase::InitialiseWindow()
+bool ApplicationBase::InitialiseOGLFunctions()
 {
-	if (glfwInit() == false)
-	{
-		ERROR_MSG("GL Initialisation Failed");
-		return;
-	}
-
-	m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "Game Engine", nullptr, nullptr);
-
-	glfwMakeContextCurrent(m_window);
-
+	// Check LoadFunctions
 	if (ogl_LoadFunctions() == ogl_LOAD_FAILED)
 	{
-		glfwDestroyWindow(m_window);
-		glfwTerminate();
-		ERROR_MSG("LOAD FAILED.");
-		return;
+		DEBUG::ERROR_MSG("OGL LoadFunctions Failed.");
+		return false;
 	}
-
-	m_GLMajor = ogl_GetMajorVersion();
-	m_GLMinor = ogl_GetMinorVersion();
-
-	glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
-	glEnable(GL_DEPTH);
-
-	return;
+	return true;
 }
 
-void ApplicationBase::FinaliseWindow()
+bool ApplicationBase::CreateOGLWindow()
+{
+	// Init GLFW
+	if (glfwInit() == false)
+	{
+		DEBUG::ERROR_MSG("GLFW Initialisation Failed");
+		return false;
+	}
+	// Create Window
+	m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, m_windowTitle.c_str(), nullptr, nullptr);
+	if (m_window == false) return false;
+
+	// Create Context
+	glfwMakeContextCurrent(m_window);
+
+	// Load Functions
+	InitialiseOGLFunctions();
+
+	// Set Defaults
+	glEnable(GL_DEPTH);
+	SetBackgroundColor(0.0f, 0.0f, 0.0f);
+
+	return true;
+}
+
+void ApplicationBase::DestroyOGLWindow()
 {
 	glfwDestroyWindow(m_window);
 	glfwTerminate();
@@ -160,8 +163,8 @@ int ApplicationBase::GetWindowHeight()
 
 void ApplicationBase::GetOGLVersion(int & _outMajor, int & _outMinor)
 {
-	_outMajor = m_GLMajor;
-	_outMinor = m_GLMinor;
+	_outMajor = ogl_GetMajorVersion();
+	_outMinor = ogl_GetMinorVersion();
 }
 
 int ApplicationBase::GetFPS()
@@ -172,4 +175,9 @@ int ApplicationBase::GetFPS()
 int ApplicationBase::GetFUPS()
 {
 	return m_FUPS;
+}
+
+void ApplicationBase::SetBackgroundColor(float _r, float _g, float _b, float _a)
+{
+	glClearColor(_r, _g, _b, _a);
 }

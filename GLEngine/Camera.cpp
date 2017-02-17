@@ -1,18 +1,16 @@
-#ifdef _DEBUG
-#define _CRTDBG_MAP_ALLOC  
-#include <crtdbg.h> 
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
-#endif
+#include "DEGUG_NEW_LEAK_DETECT.h"
+#include "DEBUG_WINDOWS_ERR_MSG.h"
 
 #include "Camera.h"
 
 #include "ApplicationBase.h"
 #include <glm/ext.hpp>
 
+Camera* GLE::MAIN_CAM = nullptr;
+
 Camera::Camera()
 {
-	m_FOV = 25;
+	m_FOV = 0.25f;
 	m_aspectRatio = (float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight();
 	m_view = glm::lookAt(
 		glm::vec3(10, 10, 10),

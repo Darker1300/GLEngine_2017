@@ -3,9 +3,7 @@
 #include <glm/glm.hpp>
 
 class Camera;
-namespace GLE {
-	static Camera* MAIN_CAM = nullptr;
-}
+namespace GLE { extern Camera* MAIN_CAM; }
 
 class Camera
 {

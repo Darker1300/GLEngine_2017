@@ -1,24 +1,33 @@
 #pragma once
 
 class ApplicationBase;
-namespace GLE {
-	static ApplicationBase* APP = nullptr;
-}
+namespace GLE { extern ApplicationBase* APP; }
 
 struct GLFWwindow;
+#include <string>
 
 class ApplicationBase
 {
 public:
-	ApplicationBase();
+	ApplicationBase(std::string _title, int _width, int _height);
 	virtual ~ApplicationBase();
 
-	void Run(int _windowWidth, int _windowHeight);
+	void Run();
 
+	int GetWindowWidth();
+	int GetWindowHeight();
+	void GetOGLVersion(int& _outMajor, int& _outMinor);
+	///<summary>Frames Per a Second.</summary>
+	int GetFPS();
+	///<summary>Fixed Updates Per a Second.</summary>
+	int GetFUPS();
+	void SetBackgroundColor(float _r, float _g, float _b, float _a = 1.0f);
+
+protected:
 	// Run Calls
 	///<summary>Occurs once before Initialise.</summary>
-	virtual int PreInitialise() { return 0; };
-	///<summary>Occurs once before Start. OpenGL is Initialised along with the GLFWwindow.</summary>
+	virtual int PreInitialise();;
+	///<summary>Occurs once before Start. OpenGL is Initialised.</summary>
 	virtual int Initialise();
 	///<summary>Occurs once before FixedUpdate, before main loop.</summary>
 	virtual int Start() { return 0; }
@@ -32,26 +41,17 @@ public:
 	virtual int Draw() { return 0; }
 	///<summary>Occurs once before Finalise, after main loop has ended.</summary>
 	virtual int Shutdown() { return 0; }
-	///<summary>Occurs once after Shutdown.</summary>
+	///<summary>Occurs once after Shutdown. OpenGL is Finalised.</summary>
 	virtual int Finalise();
 
-	int GetWindowWidth();
-	int GetWindowHeight();
-	void GetOGLVersion(int& _outMajor, int& _outMinor);
-	///<summary>Frames Per a Second.</summary>
-	int GetFPS();
-	///<summary>Fixed Updates Per a Second.</summary>
-	int GetFUPS();
+private:
+	bool InitialiseOGLFunctions();
+	bool CreateOGLWindow();
+	void DestroyOGLWindow();
 
-protected:
-	inline static void ERROR_MSG(const char* _msg);
-	void InitialiseWindow();
-	void FinaliseWindow();
-
+	std::string m_windowTitle;
 	int m_windowWidth;
 	int m_windowHeight;
-	int m_GLMajor;
-	int m_GLMinor;
 	///<summary>Frames Per a Second.</summary>
 	int m_FPS;
 	///<summary>Fixed Updates Per a Second.</summary>

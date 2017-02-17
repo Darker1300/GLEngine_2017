@@ -1,6 +1,8 @@
 #pragma once
 
 class ShaderProgram;
+class Camera;
+class Model;
 
 #include "ApplicationBase.h"
 
@@ -11,10 +13,12 @@ public:
 	~ApplicationDemo();
 
 	virtual int Start();
+	virtual int Shutdown();
 	virtual int Update(double _deltaTime);
 	virtual int Draw();
-	virtual int Shutdown();
 
 protected:
-	ShaderProgram* sProgram;
+	ShaderProgram* m_shaderProgram;
+	Camera* m_camera;
+	Model* m_quad;
 };

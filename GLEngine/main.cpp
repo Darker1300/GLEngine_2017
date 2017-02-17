@@ -1,9 +1,4 @@
-#ifdef _DEBUG
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
-#endif
+#include "DEGUG_NEW_LEAK_DETECT.h"
 
 #include "ApplicationDemo.h"
 
@@ -14,7 +9,7 @@ int main()
 #endif
 
 	ApplicationBase* app = new ApplicationDemo();
-	app->Run(1280, 720);
+	app->Run();
 	delete app;
 
 #if _DEBUG
