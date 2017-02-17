@@ -1,7 +1,7 @@
 #include "DEGUG_NEW_LEAK_DETECT.h"
 #include "DEBUG_WINDOWS_ERR_MSG.h"
 
-#include "Model.h"
+#include "Mesh.h"
 
 #include "ShaderProgram.h"
 
@@ -12,23 +12,23 @@
 #include <vector>
 #include <cmath>
 
-Model::Model()
+Mesh::Mesh()
 	: m_VertexArrayObj(-1), m_VertexBufferObj(-1), m_IndexBufferObj(-1),
 	m_vertexCount(), m_indexCount(), m_geometryType(GL_TRIANGLES)
 {
 }
 
 
-Model::~Model()
+Mesh::~Mesh()
 {
 }
 
-void Model::DrawModel(ShaderProgram * _shader, glm::mat4 * _projectionViewMatrix)
+void Mesh::DrawMesh(ShaderProgram * _shader, glm::mat4 * _projectionViewMatrix)
 {
-	DrawModel(this, _shader, _projectionViewMatrix);
+	DrawMesh(this, _shader, _projectionViewMatrix);
 }
 
-void Model::DrawModel(Model * _model, ShaderProgram * _shader, glm::mat4 * _projectionViewMatrix)
+void Mesh::DrawMesh(Mesh * _model, ShaderProgram * _shader, glm::mat4 * _projectionViewMatrix)
 {
 	// Use Shader
 	glUseProgram(_shader->m_programID);
@@ -53,12 +53,12 @@ void Model::DrawModel(Model * _model, ShaderProgram * _shader, glm::mat4 * _proj
 
 }
 
-Model * Primatives::Plane(const unsigned int _rows, const unsigned int _cols)
+Mesh * Primatives::Plane(const unsigned int _rows, const unsigned int _cols)
 {
-	// ------ Create CPU Model Data ------
+	// ------ Create CPU Mesh Data ------
 	// Create Verts
 	unsigned int vertexCount = _rows * _cols;
-	Model::Vertex* aoVertices = new Model::Vertex[vertexCount];
+	Mesh::Vertex* aoVertices = new Mesh::Vertex[vertexCount];
 	for (unsigned int r = 0; r < _rows; ++r) {
 		for (unsigned int c = 0; c < _cols; ++c) {
 			aoVertices[r * _cols + c].position = glm::vec4((float)c, 0, (float)r, 1); // create some arbitrary colour based off something 
@@ -88,19 +88,19 @@ Model * Primatives::Plane(const unsigned int _rows, const unsigned int _cols)
 		}
 	}
 
-	Model* plane = new Model();
+	Mesh* plane = new Mesh();
 
-	// Set additional Model info
+	// Set additional Mesh info
 	plane->m_vertexCount = vertexCount;
 	plane->m_indexCount = indexCount;
 	plane->m_geometryType = GL_TRIANGLES;
 
 	// ------ Move to GPU ------
-
+	
 	// Vertex
 	glGenBuffers(1, &plane->m_VertexBufferObj);
 	glBindBuffer(GL_ARRAY_BUFFER, plane->m_VertexBufferObj);
-	glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Model::Vertex), aoVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Mesh::Vertex), aoVertices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// Index
@@ -121,13 +121,13 @@ Model * Primatives::Plane(const unsigned int _rows, const unsigned int _cols)
 	// Enable Arrays
 	glEnableVertexAttribArray(0);
 	// Set Attribute pointers
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Model::Vertex), (void*)offsetof(Model::Vertex, Model::Vertex::position));
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, Mesh::Vertex::position));
 
 	// colour:
 	// Enable Arrays
 	glEnableVertexAttribArray(1);
 	// Set Attribute pointers
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(unsigned int), (void*)offsetof(Model::Vertex, Model::Vertex::colour));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(unsigned int), (void*)offsetof(Mesh::Vertex, Mesh::Vertex::colour));
 
 	// ---------------------------------
 
@@ -141,9 +141,9 @@ Model * Primatives::Plane(const unsigned int _rows, const unsigned int _cols)
 	return plane;
 }
 
-Model * Primatives::Sphere(const float _radius, const unsigned int _rings, const unsigned int _sectors)
+Mesh * Primatives::Sphere(const float _radius, const unsigned int _rings, const unsigned int _sectors)
 {
-	std::vector<Model::Vertex> vertices;
+	std::vector<Mesh::Vertex> vertices;
 	//std::vector<GLfloat> normals;
 	//std::vector<GLfloat> texcoords;
 	std::vector<unsigned int> indices;
@@ -157,7 +157,7 @@ Model * Primatives::Sphere(const float _radius, const unsigned int _rings, const
 	vertices.resize(_rings * _sectors * 3);
 	//	normals.resize(_rings * _sectors * 3);
 	//	texcoords.resize(_rings * _sectors * 2);
-	std::vector<Model::Vertex>::iterator v = vertices.begin();
+	std::vector<Mesh::Vertex>::iterator v = vertices.begin();
 	//	std::vector<GLfloat>::iterator n = normals.begin();
 	//	std::vector<GLfloat>::iterator t = texcoords.begin();
 	for (r = 0; r < (int)_rings; r++) for (s = 0; s < (int)_sectors; s++) {
@@ -174,7 +174,7 @@ Model * Primatives::Sphere(const float _radius, const unsigned int _rings, const
 		v->position = pos;
 
 		// Colour
-		glm::vec4 colour = glm::vec4(sinf(x), sinf(x * 10), sinf((x * 10) * y), 1);
+		glm::vec4 colour = glm::vec4(cosf(y), cosf(y * 10), cosf((y * 10) * x), 1);
 		v->colour = colour;
 
 		// Normal
@@ -193,9 +193,9 @@ Model * Primatives::Sphere(const float _radius, const unsigned int _rings, const
 		*i++ = (r + 1) * _sectors + s;
 	}
 
-	Model* sphere = new Model();
+	Mesh* sphere = new Mesh();
 
-	// Set additional Model info
+	// Set additional Mesh info
 	sphere->m_vertexCount = vertices.size();
 	sphere->m_indexCount = indices.size();
 	sphere->m_geometryType = GL_QUADS;
@@ -204,7 +204,7 @@ Model * Primatives::Sphere(const float _radius, const unsigned int _rings, const
 		// Vertex
 	glGenBuffers(1, &sphere->m_VertexBufferObj);
 	glBindBuffer(GL_ARRAY_BUFFER, sphere->m_VertexBufferObj);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Model::Vertex), &vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Mesh::Vertex), &vertices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// Index
@@ -225,13 +225,13 @@ Model * Primatives::Sphere(const float _radius, const unsigned int _rings, const
 	// Enable Arrays
 	glEnableVertexAttribArray(0);
 	// Set Attribute pointers
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Model::Vertex), (void*)offsetof(Model::Vertex, Model::Vertex::position));
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, Mesh::Vertex::position));
 
 	// colour:
 	// Enable Arrays
 	glEnableVertexAttribArray(1);
 	// Set Attribute pointers
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Model::Vertex), (void*)offsetof(Model::Vertex, Model::Vertex::colour));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, Mesh::Vertex::colour));
 	// ---------------------------------
 
 	// Bind Array Buf

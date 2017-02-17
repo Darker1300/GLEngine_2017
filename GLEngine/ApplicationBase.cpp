@@ -140,6 +140,7 @@ bool ApplicationBase::CreateOGLWindow()
 
 	// Set Defaults
 	glEnable(GL_DEPTH);
+	glEnable(GL_DEPTH_TEST);
 	SetBackgroundColor(0.0f, 0.0f, 0.0f);
 
 	return true;

@@ -11,7 +11,7 @@
 #include "Camera.h"
 #include "ShaderProgram.h"
 #include "Shaders1.h"
-#include "Model.h"
+#include "Mesh.h"
 
 
 ApplicationDemo::ApplicationDemo()
@@ -24,6 +24,9 @@ int ApplicationDemo::Start()
 	if (ApplicationBase::Start()) return -1;
 
 	SetBackgroundColor(0.25f, 0.25f, 0.25f);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	m_shaderProgram = new ShaderProgram(
 		new VertexShader(vsSource),
@@ -74,8 +77,8 @@ int ApplicationDemo::Draw()
 
 	glm::mat4 projView = GLE::MAIN_CAM->m_projection * GLE::MAIN_CAM->m_view;
 
-	m_sphere->DrawModel(m_shaderProgram, &projView);
-	m_quad->DrawModel(m_shaderProgram, &projView);
+	m_sphere->DrawMesh(m_shaderProgram, &projView);
+	m_quad->DrawMesh(m_shaderProgram, &projView);
 
 	return 0;
 }
