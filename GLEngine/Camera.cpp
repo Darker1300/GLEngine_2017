@@ -13,8 +13,8 @@ Camera::Camera()
 	m_FOV = 0.25f;
 	m_aspectRatio = (float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight();
 	m_view = glm::lookAt(
-		glm::vec3(1),
-		glm::vec3(0.55, 0, 0.55),
+		glm::vec3(30),
+		glm::vec3(-5, 0, -5),
 		glm::vec3(0, 1, 0));
 
 	m_projection = glm::perspective(
@@ -51,6 +51,24 @@ void Camera::SetAsMain(Camera * _camera)
 
 	GLE::MAIN_CAM = _camera;
 	GLE::MAIN_CAM->OnGainFocus();
+}
+
+void Camera::SetPos(glm::vec3 _newPos)
+{
+	m_position = _newPos;
+}
+
+void Camera::SetDir(glm::vec3 _newDir)
+{
+	m_direction = _newDir;
+}
+
+void Camera::UpdateView()
+{
+	m_view = glm::lookAt(
+		m_position,
+		m_position + m_direction,
+		glm::vec3(0, 1, 0));
 }
 
 void Camera::OnGainFocus()

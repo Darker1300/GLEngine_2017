@@ -21,4 +21,6 @@ protected:
 	ShaderProgram* m_shaderProgram;
 	Camera* m_camera;
 	Model* m_quad;
+	Model* m_sphere;
+	int _bounceDir;
 };

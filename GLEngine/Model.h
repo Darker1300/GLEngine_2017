@@ -23,8 +23,12 @@ public:
 		glm::vec4 colour;
 	};
 
-	void GeneratePlane(unsigned int rows, unsigned int cols);
-
 	void DrawModel(ShaderProgram* _shader, glm::mat4* _projectionViewMatrix);
 	static void DrawModel(Model* _model, ShaderProgram* _shader, glm::mat4* _projectionViewMatrix);
 };
+
+namespace Primatives
+{
+	Model* Plane(const unsigned int _rows, const unsigned int _cols);
+	Model* Sphere(const float _radius, const unsigned int _rings, const unsigned int _sectors);
+}

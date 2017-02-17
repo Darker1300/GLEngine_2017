@@ -26,7 +26,7 @@ public:
 protected:
 	// Run Calls
 	///<summary>Occurs once before Initialise.</summary>
-	virtual int PreInitialise();;
+	virtual int PreInitialise();
 	///<summary>Occurs once before Start. OpenGL is Initialised.</summary>
 	virtual int Initialise();
 	///<summary>Occurs once before FixedUpdate, before main loop.</summary>
