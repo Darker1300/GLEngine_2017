@@ -13,8 +13,8 @@ Camera::Camera()
 	m_FOV = 0.25f;
 	m_aspectRatio = (float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight();
 	m_view = glm::lookAt(
-		glm::vec3(10, 10, 10),
-		glm::vec3(0, 0, 0),
+		glm::vec3(1),
+		glm::vec3(0.55, 0, 0.55),
 		glm::vec3(0, 1, 0));
 
 	m_projection = glm::perspective(

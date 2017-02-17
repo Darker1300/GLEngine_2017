@@ -62,32 +62,41 @@ void Model::GeneratePlane(unsigned int rows, unsigned int cols)
 
 	// ------ Move to GPU ------
 
-	// Gen Vert, Index, VA
+	// Vertex
 	glGenBuffers(1, &m_VertexBufferObj);
-	glGenBuffers(1, &m_IndexBufferObj);
-	glGenVertexArrays(1, &m_VertexArrayObj);
-
-	// Bind VA
-	glBindVertexArray(m_VertexArrayObj);
-
-	// Bind Index
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBufferObj);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), auiIndices, GL_STATIC_DRAW);
-
-
-	// Bind Vert
 	glBindBuffer(GL_ARRAY_BUFFER, m_VertexBufferObj);
 	glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), aoVertices, GL_STATIC_DRAW);
-
-
-	// Enable Arrays
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	// Set Attribute pointers
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, colour));
-	// Bind Array Buf
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	// Index
+	glGenBuffers(1, &m_IndexBufferObj);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBufferObj);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), auiIndices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	// VA
+	glGenVertexArrays(1, &m_VertexArrayObj);
+	glBindVertexArray(m_VertexArrayObj);
+		// Bind VBO & IBO to VAO
+	glBindBuffer(GL_ARRAY_BUFFER, m_VertexBufferObj);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBufferObj);
+
+	// ----- Set Attribute details -----
+		// position:
+			// Enable Arrays
+	glEnableVertexAttribArray(0);
+			// Set Attribute pointers
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+
+		// colour:
+			// Enable Arrays
+	glEnableVertexAttribArray(1);
+			// Set Attribute pointers
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, colour));
+	
+	// Bind Array Buf
+				// glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
 	// Cleanup cpu data
 	delete[] aoVertices;
@@ -103,17 +112,23 @@ void Model::DrawModel(Model * _model, ShaderProgram * _shader, glm::mat4 * _proj
 {
 	// Use Shader
 	glUseProgram(_shader->m_programID);
+
+	// ----- Uniforms -----
 	// Get projectionViewGlobalMatrix uniform location
 	unsigned int projectionViewUniformLocation = glGetUniformLocation(_shader->m_programID, "projectionViewWorldMatrix");
 	// Test ^ if failed
 	if (projectionViewUniformLocation == -1) {
 		DEBUG::ERROR_MSG("glGetUniformLocation(projectionViewWorldMatrix) failed.");
 	}
-	// Apply matrix CPU-->GPU
+	// Apply matrix uniform CPU-->GPU
 	glUniformMatrix4fv(projectionViewUniformLocation, 1, false, glm::value_ptr(*_projectionViewMatrix));
-	
+	// --------------------
+
 	// Bind Vertex and Index buffers
 	glBindVertexArray(_model->m_VertexArrayObj);
 	// Draw
 	glDrawElements(_model->m_geometryType, _model->m_indexCount, GL_UNSIGNED_INT, 0);
+	// Unbind Vertex and Index buffers
+	glBindVertexArray(0);
+
 }
