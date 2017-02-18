@@ -10,8 +10,9 @@
 
 #include "Camera.h"
 #include "ShaderProgram.h"
-#include "Shaders1.h"
+#include "ShadersPack.h"
 #include "Mesh.h"
+#include "Primatives.h"
 
 
 ApplicationDemo::ApplicationDemo()
@@ -29,8 +30,8 @@ int ApplicationDemo::Start()
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	m_shaderProgram = new ShaderProgram(
-		new VertexShader(vsSource),
-		new FragmentShader(fsSource));
+		new VertexShader(SSP::vertexSource),
+		new FragmentShader(SSP::fragmentSource));
 
 	m_camera = new Camera();
 	m_camera->SetAsMain();
@@ -58,14 +59,24 @@ int ApplicationDemo::Shutdown()
 	return 0;
 }
 
+int ApplicationDemo::FixedUpdate(double _deltaTime)
+{
+	if (ApplicationBase::FixedUpdate(_deltaTime)) return -1;
+
+	// Bounce Camera
+	static float Range = 0.5;
+	if (m_camera->m_direction.x > Range || m_camera->m_direction.x < -Range)
+		_bounceDir = -_bounceDir;
+	m_camera->m_direction.x += (float)(_bounceDir * 0.4 * _deltaTime);
+
+	return 0;
+}
+
 int ApplicationDemo::Update(double _deltaTime)
 {
 	if (ApplicationBase::Update(_deltaTime)) return -1;
 
 	// Bounce Camera
-	if (m_camera->m_direction.x > 0.5f || m_camera->m_direction.x < -0.5f)
-		_bounceDir = -_bounceDir;
-	m_camera->m_direction.x += (float)(_bounceDir * 0.4 * _deltaTime);
 	m_camera->UpdateView();
 
 	return 0;

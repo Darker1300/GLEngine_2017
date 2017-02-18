@@ -44,3 +44,11 @@ protected:
 	void TestCompilation();
 	void DeleteShaders();
 };
+
+struct SHADER_BASE;
+template <class T>
+class TShaderProgram : public ShaderProgram
+{
+	//ShaderProgram(SHADER_BASE& _ShaderType)<T> {}
+
+};

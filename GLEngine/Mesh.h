@@ -23,12 +23,9 @@ public:
 		glm::vec4 colour;
 	};
 
+	void GenerateBuffers();
 	void DrawMesh(ShaderProgram* _shader, glm::mat4* _projectionViewMatrix);
 	static void DrawMesh(Mesh* _model, ShaderProgram* _shader, glm::mat4* _projectionViewMatrix);
-};
+protected:
 
-namespace Primatives
-{
-	Mesh* Plane(const unsigned int _rows, const unsigned int _cols);
-	Mesh* Sphere(const float _radius, const unsigned int _rings, const unsigned int _sectors);
-}
+};

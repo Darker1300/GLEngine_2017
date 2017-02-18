@@ -1,4 +1,5 @@
 #include "DEGUG_NEW_LEAK_DETECT.h"
+#define USE_CONSOLE_LOG true
 
 #include "ApplicationDemo.h"
 

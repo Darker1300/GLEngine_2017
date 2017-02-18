@@ -4,3 +4,5 @@ GLEngine/Debug/
 *.opendb
 *.db
 *.suo
+*.sdf
+GLEngine/x64/

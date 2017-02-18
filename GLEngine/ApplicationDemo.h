@@ -12,10 +12,11 @@ public:
 	ApplicationDemo();
 	~ApplicationDemo();
 
-	virtual int Start();
-	virtual int Shutdown();
-	virtual int Update(double _deltaTime);
-	virtual int Draw();
+	int Start();
+	int Shutdown();
+	int FixedUpdate(double _deltaTime);
+	int Update(double _deltaTime);
+	int Draw();
 
 protected:
 	ShaderProgram* m_shaderProgram;

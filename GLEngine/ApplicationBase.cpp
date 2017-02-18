@@ -5,7 +5,7 @@
 
 #include <gl_core_4_4.h>
 #include <GlFW/glfw3.h>
-#include <iostream>
+
 
 ApplicationBase* GLE::APP = nullptr;
 
@@ -22,7 +22,6 @@ ApplicationBase::~ApplicationBase()
 
 void ApplicationBase::Run()
 {
-
 	static double second = 1.0;
 	m_targetFPS = 60.0;
 	m_fixedDTInterval = second / m_targetFPS;
@@ -32,11 +31,11 @@ void ApplicationBase::Run()
 	int currentFPS = 0, fixedUpdates = 0;
 
 	// PreInitialise Event
-	if (PreInitialise() != 0) { DEBUG::ERROR_MSG("ApplicationBase.PreInitialise Failed."); }
+	if (PreInitialise()) { LOG_ERROR("ApplicationBase.PreInitialise Failed.") }
 	// Initialise Event
-	if (Initialise() != 0) { DEBUG::ERROR_MSG("ApplicationBase.Initialise Failed."); }
+	if (Initialise()) { LOG_ERROR("ApplicationBase.Initialise Failed.") }
 	// Start Event
-	if (Start() != 0) { DEBUG::ERROR_MSG("ApplicationBase.Start Failed."); }
+	if (Start()) { LOG_ERROR("ApplicationBase.Start Failed.") }
 
 	// While window is alive
 	while (glfwWindowShouldClose(m_window) == false)
@@ -53,19 +52,19 @@ void ApplicationBase::Run()
 		// Only FixedUpdate at fixed frames / s
 		while (fixedDeltaTime >= second) {
 			// FixedUpdate Event
-			if (FixedUpdate(m_fixedDTInterval) != 0) { DEBUG::ERROR_MSG("ApplicationBase.FixedUpdate Failed."); }
+			if (FixedUpdate(m_fixedDTInterval)) { LOG_ERROR("ApplicationBase.FixedUpdate Failed.") }
 
 			// Measure timing
 			fixedUpdates++;
 			fixedDeltaTime -= second;
 		}
 		// Update Event
-		if (Update(deltaTime) != 0) { DEBUG::ERROR_MSG("ApplicationBase.Update Failed."); }
+		if (Update(deltaTime)) { LOG_ERROR("ApplicationBase.Update Failed.") }
 		// LateUpdate Event
-		if (LateUpdate(deltaTime) != 0) { DEBUG::ERROR_MSG("ApplicationBase.LateUpdate Failed."); }
+		if (LateUpdate(deltaTime)) { LOG_ERROR("ApplicationBase.LateUpdate Failed.") }
 
 		// Draw Event, at maximum possible frames
-		if (Draw() != 0) { DEBUG::ERROR_MSG("ApplicationBase.Draw Failed."); }
+		if (Draw()) { LOG_ERROR("ApplicationBase.Draw Failed.") }
 
 		// Double Buffer
 		glfwSwapBuffers(m_window);
@@ -85,9 +84,9 @@ void ApplicationBase::Run()
 		}
 	}
 	// Shutdown Event
-	if (Shutdown() != 0) { DEBUG::ERROR_MSG("ApplicationBase.Shutdown Failed."); }
+	if (Shutdown()) { LOG_ERROR("ApplicationBase.Shutdown Failed.") }
 	// Finalise Event
-	if (Finalise() != 0) { DEBUG::ERROR_MSG("ApplicationBase.Finalise Failed."); }
+	if (Finalise()) { LOG_ERROR("ApplicationBase.Finalise Failed.") }
 }
 
 int ApplicationBase::PreInitialise()
@@ -114,7 +113,7 @@ bool ApplicationBase::InitialiseOGLFunctions()
 	// Check LoadFunctions
 	if (ogl_LoadFunctions() == ogl_LOAD_FAILED)
 	{
-		DEBUG::ERROR_MSG("OGL LoadFunctions Failed.");
+		LOG_ERROR("OGL LoadFunctions Failed.")
 		return false;
 	}
 	return true;
@@ -125,7 +124,7 @@ bool ApplicationBase::CreateOGLWindow()
 	// Init GLFW
 	if (glfwInit() == false)
 	{
-		DEBUG::ERROR_MSG("GLFW Initialisation Failed");
+		LOG_ERROR("GLFW Initialisation Failed")
 		return false;
 	}
 	// Create Window

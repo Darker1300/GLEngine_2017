@@ -102,14 +102,14 @@ void ShaderProgram::TestCompilation()
 	glGetProgramiv(m_programID, GL_LINK_STATUS, &success);
 	if (success == GL_FALSE)
 	{
-		// DEBUG
+		// DEBUG_LOG
 		int infoLogLength = 0;
 		glGetProgramiv(m_programID, GL_INFO_LOG_LENGTH, &infoLogLength);
 		char* infoLog = new char[infoLogLength];
 		glGetProgramInfoLog(m_programID, infoLogLength, 0, infoLog);
 		printf("Error: Failed to link shader program!\n");
 		printf("%s\n", infoLog);
-		DEBUG::ERROR_MSG(std::string("Failed to link shader program " + std::to_string(m_programID) + "."));
+		// DEBUG_LOG::ERROR_MSG(std::string("Failed to link shader program " + std::to_string(m_programID) + "."));
 		delete[] infoLog;
 	}
 }
