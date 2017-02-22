@@ -1,6 +1,6 @@
 #include "ShaderSet.h"
 
-const char* SHADER_BASE::vertexSource =
+const char* gl::SHADER_BASE::vertexSource =
 "\
 		#version 410 \n\n	\
 		layout(location=0) in vec4 position;	\
@@ -15,7 +15,7 @@ const char* SHADER_BASE::vertexSource =
 			\
 		";
 
-const char* SHADER_BASE::fragmentSource =
+const char* gl::SHADER_BASE::fragmentSource =
 "\
 		#version 410 \n\n	\
 		in vec4 vColour;	\

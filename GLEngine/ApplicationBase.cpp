@@ -22,9 +22,9 @@ ApplicationBase::~ApplicationBase()
 
 void ApplicationBase::Run()
 {
-	static double second = 1.0;
+	static double second = 1.0f;
 	m_targetFPS = 60.0;
-	m_fixedDTInterval = second / m_targetFPS;
+	m_fixedDTInterval = second * m_targetFPS;
 
 	double lastTime = glfwGetTime(), timer = lastTime;
 	double deltaTime = 0, fixedDeltaTime = 0, nowTime = 0;
@@ -37,7 +37,7 @@ void ApplicationBase::Run()
 	// Start Event
 	if (Start()) { LOG_ERROR("ApplicationBase.Start Failed.") }
 
-	// While window is alive
+	// While window is alives
 	while (glfwWindowShouldClose(m_window) == false)
 	{
 		// Clear screen
@@ -114,7 +114,7 @@ bool ApplicationBase::InitialiseOGLFunctions()
 	if (ogl_LoadFunctions() == ogl_LOAD_FAILED)
 	{
 		LOG_ERROR("OGL LoadFunctions Failed.")
-		return false;
+			return false;
 	}
 	return true;
 }
@@ -125,7 +125,7 @@ bool ApplicationBase::CreateOGLWindow()
 	if (glfwInit() == false)
 	{
 		LOG_ERROR("GLFW Initialisation Failed")
-		return false;
+			return false;
 	}
 	// Create Window
 	m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, m_windowTitle.c_str(), nullptr, nullptr);
@@ -159,6 +159,11 @@ int ApplicationBase::GetWindowWidth()
 int ApplicationBase::GetWindowHeight()
 {
 	return m_windowHeight;
+}
+
+GLFWwindow * ApplicationBase::GetWindow()
+{
+	return m_window;
 }
 
 void ApplicationBase::GetOGLVersion(int & _outMajor, int & _outMinor)

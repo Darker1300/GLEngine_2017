@@ -7,6 +7,8 @@
 #include <GlFW/glfw3.h>
 #include <iostream>
 
+#include "ShaderSet.h"
+
 
 #pragma region IShaderBase
 

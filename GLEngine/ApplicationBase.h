@@ -16,6 +16,7 @@ public:
 
 	int GetWindowWidth();
 	int GetWindowHeight();
+	GLFWwindow* GetWindow();
 	void GetOGLVersion(int& _outMajor, int& _outMinor);
 	///<summary>Frames Per a Second.</summary>
 	int GetFPS();

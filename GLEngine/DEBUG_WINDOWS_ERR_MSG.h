@@ -16,7 +16,7 @@
 #include <sstream>
 #include <iostream>
 #define LOG_ERROR(...) DEBUG_LOG::PrintErrorMsg(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__);
-
+ 
 #else
 // Release
 #define LOG_ERROR(...)
