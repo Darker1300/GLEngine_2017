@@ -7,12 +7,12 @@
 #include <GlFW/glfw3.h>
 #include <iostream>
 
-#include "ShaderSet.h"
-
+#include "ShaderCollection.h"
 
 #pragma region IShaderBase
 
-IShaderBase::IShaderBase(unsigned int _shaderType, const char * _source)
+IShaderBase::IShaderBase(
+	unsigned int _shaderType, const char * const _source)
 {
 	m_shaderID = glCreateShader(_shaderType);
 
@@ -36,7 +36,7 @@ void IShaderBase::DeleteComponent()
 
 #pragma region Vertex Shader
 
-VertexShader::VertexShader(const char * _source)
+VertexShader::VertexShader(const char * const _source)
 	: IShaderBase(GL_VERTEX_SHADER, _source) {}
 
 VertexShader::~VertexShader() {}
@@ -45,34 +45,45 @@ VertexShader::~VertexShader() {}
 
 #pragma region Fragment Shader
 
-FragmentShader::FragmentShader(const char * _source)
+FragmentShader::FragmentShader(const char * const _source)
 	: IShaderBase(GL_FRAGMENT_SHADER, _source) {}
 
 FragmentShader::~FragmentShader() {}
 
 #pragma endregion Fragment Shader
 
-ShaderProgram::ShaderProgram(IShaderBase ** _shaders, int _count)
-{
-	m_shaders = _shaders;
-	m_shadersCount = _count;
-}
+//ShaderProgram::ShaderProgram(IShaderBase ** _shaders, unsigned int _shadersCount, const char** const _uniforms, const unsigned int _uniformsCount)
+//{
+//	m_shaders = _shaders;
+//	m_shadersCount = _shadersCount;
+//
+//	SetupShaderProgram();
+//}
 
-ShaderProgram::ShaderProgram(VertexShader * _vertex, FragmentShader * _fragment)
+ShaderProgram::ShaderProgram(VertexShader * _vertex, FragmentShader * _fragment, const char* const _uniforms[], const unsigned int _uniformsCount)
 {
 	static const int size = 2;
 	m_shaders = new IShaderBase*[size] { _vertex, _fragment };
 	m_shadersCount = size;
 
 	SetupShaderProgram();
+	//AssignUniforms(_uniforms, _uniformsCount);
+	// DeleteComponents();
 }
 
 ShaderProgram::~ShaderProgram()
 {
-	for (int i = 0; i < m_shadersCount; i++) {
+	for (unsigned int i = 0; i < m_shadersCount; i++) {
 		delete m_shaders[i];
 	}
 	delete[] m_shaders;
+	// Delete program
+	glDeleteProgram(m_programID);
+}
+
+void ShaderProgram::UseShader(bool _status)
+{
+	glUseProgram(_status ? m_programID : 0);
 }
 
 void ShaderProgram::SetupShaderProgram()
@@ -82,7 +93,20 @@ void ShaderProgram::SetupShaderProgram()
 #ifdef _DEBUG
 	TestCompilation();
 #endif
-	DeleteShaders();
+}
+
+void ShaderProgram::AssignUniforms(const char* const _uniforms[], const unsigned int _uniformsCount)
+{
+	for (unsigned int u = 0; u < _uniformsCount; u++)
+	{
+		const char* text = _uniforms[u];
+		if (text == NULL) { LOG_ERROR("_uniformsCount: ", _uniformsCount, " is incorrect.") }
+
+		int location = glGetUniformLocation(m_programID, text);
+		if (location < 0) { LOG_ERROR("glGetUniformLocation( ", text, " ) failed.") }
+
+		m_uniforms[location] = text;
+	}
 }
 
 void ShaderProgram::CreateProgramID()
@@ -92,7 +116,7 @@ void ShaderProgram::CreateProgramID()
 
 void ShaderProgram::AttachLinkShaders()
 {
-	for (int i = 0; i < m_shadersCount; i++) {
+	for (unsigned int i = 0; i < m_shadersCount; i++) {
 		m_shaders[i]->AttachLinkShaders(this);
 	}
 	glLinkProgram(m_programID);
@@ -116,9 +140,9 @@ void ShaderProgram::TestCompilation()
 	}
 }
 
-void ShaderProgram::DeleteShaders()
+void ShaderProgram::DeleteComponents()
 {
-	for (int i = 0; i < m_shadersCount; i++) {
+	for (unsigned int i = 0; i < m_shadersCount; i++) {
 		m_shaders[i]->DeleteComponent();
 	}
 }

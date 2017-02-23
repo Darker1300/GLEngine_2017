@@ -3,6 +3,7 @@
 class ShaderProgram;
 class CameraBase;
 class Mesh;
+namespace gl { class Texture; };
 
 #include "ApplicationBase.h"
 
@@ -23,5 +24,6 @@ protected:
 	CameraBase* m_camera;
 	Mesh* m_quad;
 	Mesh* m_sphere;
-	int _bounceDir;
+	gl::Texture* m_tex;
+	//int _bounceDir;
 };

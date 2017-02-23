@@ -1,11 +1,12 @@
 #pragma once
+#include <map>
 
 class IShaderBase
 {
 public:
 	friend class ShaderProgram;
 
-	IShaderBase(unsigned int _shaderType, const char* _source);
+	IShaderBase(unsigned int _shaderType, const char* const _source);
 	virtual ~IShaderBase();
 
 	unsigned int m_shaderID;
@@ -16,39 +17,36 @@ protected:
 };
 
 struct VertexShader : public IShaderBase {
-	VertexShader(const char* _source);
+	VertexShader(const char* const _source);
 	~VertexShader();
 };
 
 struct FragmentShader : public IShaderBase {
-	FragmentShader(const char* _source);
+	FragmentShader(const char* const _source);
 	~FragmentShader();
 };
 
 class ShaderProgram
 {
 public:
-	ShaderProgram(IShaderBase** _shaders, int _count);
-	ShaderProgram(VertexShader* _vertex, FragmentShader* _fragment);
+	//ShaderProgram(IShaderBase** _shaders, unsigned int _shadersCount, const char** const _uniforms = nullptr, const unsigned int _uniformsCount = 0);
+	ShaderProgram(VertexShader* _vertex, FragmentShader* _fragment, const char* const _uniforms[] = nullptr, const unsigned int _uniformsCount = 0);
+
 	~ShaderProgram();
 
-	void SetupShaderProgram();
+	void UseShader(bool _status = true);
 
 	unsigned int m_programID;
 	IShaderBase** m_shaders;
-	int m_shadersCount;
+	unsigned int m_shadersCount;
+	std::map<int, const char*> m_uniforms;
 
 protected:
+	void SetupShaderProgram();
+
+	void AssignUniforms(const char* const _uniforms[], const unsigned int _uniformsCount);
 	void CreateProgramID();
 	void AttachLinkShaders();
 	void TestCompilation();
-	void DeleteShaders();
-};
-
-struct SHADER_BASE;
-template <class T>
-class TShaderProgram : public ShaderProgram
-{
-	//ShaderProgram(SHADER_BASE& _ShaderType)<T> {}
-
+	void DeleteComponents();
 };

@@ -3,6 +3,9 @@
 
 #include "ApplicationDemo.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 #include <gl_core_4_4.h>
 #include <GlFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -10,10 +13,10 @@
 
 #include "FlyCamera.h"
 #include "ShaderProgram.h"
-#include "ShadersPack.h"
+#include "ShaderCollection.h"
 #include "Mesh.h"
 #include "Primatives.h"
-
+#include "Texture.h"
 
 ApplicationDemo::ApplicationDemo()
 	: ApplicationBase("Game Engine Demo", 1280, 720) {}
@@ -29,9 +32,16 @@ int ApplicationDemo::Start()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	m_shaderProgram = new ShaderProgram(
-		new VertexShader(SSP::vertexSource),
-		new FragmentShader(SSP::fragmentSource));
+	{
+		using namespace gl;
+#define SHADER_CURRENT SHADER_TEX
+		m_shaderProgram = new ShaderProgram(
+			new VertexShader(SHADER_CURRENT::vertexSource),
+			new FragmentShader(SHADER_CURRENT::fragmentSource),
+			SHADER_CURRENT::uniforms,
+			SHADER_CURRENT::uniformsCount
+		);
+	}
 
 	m_camera = new FlyCamera(GetWindow(), 10);
 
@@ -43,15 +53,15 @@ int ApplicationDemo::Start()
 		glm::vec3(0, 20, 40),
 		glm::vec3(0, 0, 0),
 		glm::vec3(0, 1, 0));
-	//m_camera->SetAsMain();
+	//m_camera->SetAsMain();S
 
-	m_quad = Primatives::Plane(20, 20);
+	// m_quad = Primatives::Plane(20, 20);
 	m_sphere = Primatives::Sphere(10, 33, 33);
-
+	m_tex = gl::Texture::Load("./textures/ship.png");
 	//m_camera->SetPos({ 0, 20,	50 });
 	//m_camera->SetDir({ 0, -0.5, -1 });
 	//m_camera->UpdateView();
-	_bounceDir = 1;
+	//_bounceDir = 1;
 
 	return 0;
 }
@@ -60,8 +70,9 @@ int ApplicationDemo::Shutdown()
 {
 	if (ApplicationBase::Shutdown()) return -1;
 
+	delete m_tex;
 	delete m_sphere;
-	delete m_quad;
+	// delete m_quad;
 	delete m_camera;
 	delete m_shaderProgram;
 
@@ -86,7 +97,7 @@ int ApplicationDemo::Update(double _deltaTime)
 {
 	if (ApplicationBase::Update(_deltaTime)) return -1;
 
-	m_camera->Update(_deltaTime);
+	m_camera->Update((float)_deltaTime);
 	// Bounce Camera
 	/*m_camera->UpdateView();*/
 
@@ -100,8 +111,9 @@ int ApplicationDemo::Draw()
 	//glm::mat4 projView = GLE::MAIN_CAM->m_projection * GLE::MAIN_CAM->m_view;
 	glm::mat4 projView = m_camera->GetProjectionView();
 
-	m_sphere->DrawMesh(m_shaderProgram, &projView);
-	m_quad->DrawMesh(m_shaderProgram, &projView);
+	//m_sphere->UpdateUniforms(m_shaderProgram, &projView);
+	m_sphere->DrawMesh(m_shaderProgram, &projView, m_tex);
+	// m_quad->DrawMesh(m_shaderProgram, &projView);
 
 	return 0;
 }

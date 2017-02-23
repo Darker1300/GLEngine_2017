@@ -24,6 +24,7 @@ void CameraBase::SetPosition(const glm::vec3 & _pos)
 
 void CameraBase::LookAt(const glm::vec3 & _eye, const glm::vec3 & _center, const glm::vec3 & _worldUp)
 {
+	//m_direction = glm::normalize(_center - _eye);
 	m_viewTransform = glm::lookAt(_eye, _center, _worldUp);
 	UpdateWorldFromView();
 }
