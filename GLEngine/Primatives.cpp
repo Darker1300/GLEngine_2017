@@ -1,5 +1,5 @@
 #include "Primatives.h"
-#include "DEGUG_NEW_LEAK_DETECT.h"
+#include "DEBUG_NEW_LEAK_DETECT.h"
 
 #include "Mesh.h"
 
@@ -13,22 +13,33 @@
 
 Mesh * Primatives::Plane(const unsigned int _rows, const unsigned int _cols)
 {
+#define STD_Vert gl::SHADER_TEX::Vertex
+
 	// ------ Create CPU Mesh Data ------
 	// Create Verts
-	unsigned int vertexCount = _rows * _cols;
-	Mesh::Vertex* aoVertices = new Mesh::Vertex[vertexCount];
-	for (unsigned int r = 0; r < _rows; ++r) {
-		for (unsigned int c = 0; c < _cols; ++c) {
-			aoVertices[r * _cols + c].position = glm::vec4((float)c, 0, (float)r, 1); // create some arbitrary colour based off something 
-																					  // that might not be related to tiling a texture
+	unsigned int verticesSize = _rows * _cols;
+	STD_Vert* vertices = new STD_Vert[verticesSize];
+
+#pragma region  Generate Mesh
+
+	for (unsigned int r = 0; r < _rows; ++r)
+	{
+		for (unsigned int c = 0; c < _cols; ++c)
+		{
+			STD_Vert& vert = vertices[r * _cols + c];
+			// Position
+			vert.position = glm::vec4((float)c, 0, (float)r, 1);
+			// TexCoord
+			vert.texCoord = glm::vec2(r * (1.0f / _rows), c * (1.0f / _cols));
+			// Colour
 			glm::vec3 colour = glm::vec3(sinf((c / (float)(_cols - 1)) * (r / (float)(_rows - 1))));
-			aoVertices[r * _cols + c].colour = glm::vec4(colour, 1);
+			vert.colour = glm::vec4(colour, 1);
 		}
 	}
 
 	// Create Indices. Defining index count based off quad count (2 triangles per quad)
-	unsigned int indexCount = (_rows - 1) * (_cols - 1) * 6;
-	unsigned int* auiIndices = new unsigned int[indexCount];
+	unsigned int indicesSize = (_rows - 1) * (_cols - 1) * 6;
+	unsigned int* indices = new unsigned int[indicesSize];
 
 	unsigned int index = 0;
 	for (unsigned int r = 0; r < (_rows - 1); ++r)
@@ -36,65 +47,59 @@ Mesh * Primatives::Plane(const unsigned int _rows, const unsigned int _cols)
 		for (unsigned int c = 0; c < (_cols - 1); ++c)
 		{
 			// Triangle 1
-			auiIndices[index++] = r * _cols + c;
-			auiIndices[index++] = (r + 1) * _cols + c;
-			auiIndices[index++] = (r + 1) * _cols + (c + 1);
+			indices[index++] = r * _cols + c;
+			indices[index++] = (r + 1) * _cols + c;
+			indices[index++] = (r + 1) * _cols + (c + 1);
 			// Triangle 2
-			auiIndices[index++] = r * _cols + c;
-			auiIndices[index++] = (r + 1) * _cols + (c + 1);
-			auiIndices[index++] = r * _cols + (c + 1);
+			indices[index++] = r * _cols + c;
+			indices[index++] = (r + 1) * _cols + (c + 1);
+			indices[index++] = r * _cols + (c + 1);
 		}
 	}
+
+#pragma endregion Generate Mesh
 
 	Mesh* plane = new Mesh();
 
 	// Set additional Mesh info
-	plane->m_vertexCount = vertexCount;
-	plane->m_indexCount = indexCount;
+	plane->m_vertexCount = verticesSize;
+	plane->m_indexCount = indicesSize;
 	plane->m_geometryType = GL_TRIANGLES;
 
-	// ------ Move to GPU ------
 
-	//// Vertex
-	//glGenBuffers(1, &plane->m_VertexBufferObj);
-	//glBindBuffer(GL_ARRAY_BUFFER, plane->m_VertexBufferObj);
-	//glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Mesh::Vertex), aoVertices, GL_STATIC_DRAW);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	// ------ Copy to GPU ------
+	plane->m_vertexArray = gl::VertexArray::Create<STD_Vert>(vertices, verticesSize, indices, indicesSize);
 
-	//// Index
-	//glGenBuffers(1, &plane->m_IndexBufferObj);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, plane->m_IndexBufferObj);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), auiIndices, GL_STATIC_DRAW);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	// ----- Set Attribute details -----
 
-	//// VA
-	//glGenVertexArrays(1, &plane->m_VertexArrayObj);
-	//glBindVertexArray(plane->m_VertexArrayObj);
-	//// Bind VBO & IBO to VAO
-	//glBindBuffer(GL_ARRAY_BUFFER, plane->m_VertexBufferObj);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, plane->m_IndexBufferObj);
+	// Bind Array
+	plane->m_vertexArray->bind();
 
-	//// ----- Set Attribute details -----
-	//// position:
-	//// Enable Arrays
-	//glEnableVertexAttribArray(0);
-	//// Set Attribute pointers
-	//glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Mesh::Vertex), (void*)offsetof(Mesh::Vertex, Mesh::Vertex::position));
+	// position:
+	// Enable Arrays
+	glEnableVertexAttribArray(0);
+	// Set Attribute pointers
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(STD_Vert), (void*)offsetof(STD_Vert, STD_Vert::position));
 
-	//// colour:
-	//// Enable Arrays
-	//glEnableVertexAttribArray(1);
-	//// Set Attribute pointers
-	//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(unsigned int), (void*)offsetof(Mesh::Vertex, Mesh::Vertex::colour));
+	// colour:
+	// Enable Arrays
+	glEnableVertexAttribArray(1);
+	// Set Attribute pointers
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(STD_Vert), (void*)offsetof(STD_Vert, STD_Vert::colour));
 
-	//// ---------------------------------
+	// texCoord:
+	// Enable Arrays
+	glEnableVertexAttribArray(2);
+	// Set Attribute pointers
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(STD_Vert), (void*)offsetof(STD_Vert, STD_Vert::texCoord));
 
-	//// Bind Array Buf
-	//glBindVertexArray(0);
+	// Unbind Array
+	plane->m_vertexArray->bind(false);
+	// ---------------------------------
 
 	// Cleanup cpu data
-	delete[] aoVertices;
-	delete[] auiIndices;
+	delete[] vertices;
+	delete[] indices;
 
 	return plane;
 }
@@ -134,7 +139,6 @@ Mesh * Primatives::Sphere(const float _radius, const unsigned int _rings, const 
 
 		// Normal
 		//v->normal = glm::vec3(x,y,z);
-
 		v++;
 	}
 

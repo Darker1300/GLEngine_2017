@@ -28,6 +28,12 @@
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{9a10a60e-6514-45fd-9c21-5132880b5eb3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GL">
+      <UniqueIdentifier>{0b48b988-da34-47d7-a5a6-87db86e51cf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Dependencies">
+      <UniqueIdentifier>{f1b492a2-ad48-45e8-8048-aacce89bd6a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -75,6 +81,15 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderData.cpp">
+      <Filter>Source Files\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="tiny_obj_loader.cc">
+      <Filter>Source Files\Dependencies</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationBase.h">
@@ -85,9 +100,6 @@
     </ClInclude>
     <ClInclude Include="ApplicationDemo.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DEGUG_NEW_LEAK_DETECT.h">
-      <Filter>Header Files\Debug</Filter>
     </ClInclude>
     <ClInclude Include="DEBUG_WINDOWS_ERR_MSG.h">
       <Filter>Header Files\Debug</Filter>
@@ -100,9 +112,6 @@
     </ClInclude>
     <ClInclude Include="Primatives.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OGL_Helper.h">
-      <Filter>Header Files\GL</Filter>
     </ClInclude>
     <ClInclude Include="ShaderProgram.h">
       <Filter>Header Files\Shaders</Filter>
@@ -120,6 +129,18 @@
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderData.h">
+      <Filter>Header Files\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="DEBUG_NEW_LEAK_DETECT.h">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="tiny_obj_loader.h">
+      <Filter>Header Files\Dependencies</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

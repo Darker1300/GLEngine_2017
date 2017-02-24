@@ -1,5 +1,5 @@
 #include "ShaderCollection.h"
-#include "DEGUG_NEW_LEAK_DETECT.h"
+#include "DEBUG_NEW_LEAK_DETECT.h"
 
 #pragma region SHADER_BASE
 

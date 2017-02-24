@@ -1,4 +1,4 @@
-#include "DEGUG_NEW_LEAK_DETECT.h"
+#include "DEBUG_NEW_LEAK_DETECT.h"
 #include "DEBUG_WINDOWS_ERR_MSG.h"
 
 #include "ApplicationDemo.h"
@@ -55,9 +55,9 @@ int ApplicationDemo::Start()
 		glm::vec3(0, 1, 0));
 	//m_camera->SetAsMain();S
 
-	// m_quad = Primatives::Plane(20, 20);
-	m_sphere = Primatives::Sphere(10, 33, 33);
-	m_tex = gl::Texture::Load("./textures/ship.png");
+	m_quad = Primatives::Plane(20, 20);
+	m_sphere = Primatives::Sphere(4, 33, 33);
+	m_tex = gl::Texture::Load("./textures/ship_ori.png");
 	//m_camera->SetPos({ 0, 20,	50 });
 	//m_camera->SetDir({ 0, -0.5, -1 });
 	//m_camera->UpdateView();
@@ -111,9 +111,8 @@ int ApplicationDemo::Draw()
 	//glm::mat4 projView = GLE::MAIN_CAM->m_projection * GLE::MAIN_CAM->m_view;
 	glm::mat4 projView = m_camera->GetProjectionView();
 
-	//m_sphere->UpdateUniforms(m_shaderProgram, &projView);
 	m_sphere->DrawMesh(m_shaderProgram, &projView, m_tex);
-	// m_quad->DrawMesh(m_shaderProgram, &projView);
+	m_quad->DrawMesh(m_shaderProgram, &projView, m_tex);
 
 	return 0;
 }

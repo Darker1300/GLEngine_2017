@@ -1,8 +1,11 @@
 #pragma once
-class Renderer
-{
-public:
-	Renderer();
-	~Renderer();
-};
+namespace gl {
 
+	class Renderer
+	{
+	public:
+		Renderer();
+		~Renderer();
+	};
+
+}

@@ -1,4 +1,4 @@
-#include "DEGUG_NEW_LEAK_DETECT.h"
+#include "DEBUG_NEW_LEAK_DETECT.h"
 #include "DEBUG_WINDOWS_ERR_MSG.h"
 
 #include "ApplicationBase.h"
