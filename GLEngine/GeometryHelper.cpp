@@ -7,7 +7,7 @@
 #include "RenderData.h"
 
 namespace GeometryHelper {
-	RenderData * CreateGrid(const unsigned int _rows, const unsigned int _cols, const float _width, const float _height, const glm::vec4 _colour)
+	RenderData * CreateGrid(const unsigned int _rows, const unsigned int _cols, const float _width, const float _height, const glm::vec4& _colour)
 	{
 		// Vertices
 		unsigned int verticesSize = _rows * _cols;
@@ -26,7 +26,7 @@ namespace GeometryHelper {
 					-(_width / 2) + (colSpacing * c), 0,
 					-(_height / 2) + (rowSpacing * r), 1);
 				// Colour
-				vert.colour = glm::vec4(0, 0, 0, 1);
+				vert.colour = _colour;
 			}
 		}
 		// Indices
@@ -81,10 +81,10 @@ namespace GeometryHelper {
 		delete[] vertices;
 		delete[] indices;
 
-		return nullptr;
+		return renderData;
 	}
 
-	RenderData * CreateQuad(const float _width, const float _height, glm::vec3 facingDirection, const glm::vec4 _colour)
+	RenderData * CreateQuad(const float _width, const float _height, glm::vec3 facingDirection, const glm::vec4& _colour)
 	{
 		return nullptr;
 	}

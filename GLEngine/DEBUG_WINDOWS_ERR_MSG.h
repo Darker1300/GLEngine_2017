@@ -16,7 +16,7 @@
 #include <sstream>
 #include <iostream>
 #define LOG_ERROR(...) DEBUG_LOG::PrintErrorMsg(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__);
- 
+
 #else
 // Release
 #define LOG_ERROR(...)
@@ -81,6 +81,8 @@ namespace DEBUG_LOG {
 	{
 		std::stringstream msg = std::stringstream();
 		HELPER::ErrorMSGText(msg, _file, _line, _func, args...);
+		msg << std::endl
+			<< "<-------------------------------------------------------------->";
 		std::cout << msg.str() << std::endl;
 	}
 
@@ -96,7 +98,6 @@ namespace DEBUG_LOG {
 		std::stringstream title = std::stringstream();
 		HELPER::ErrorMSGText(msg, _file, _line, _func, args...);
 		HELPER::ErrorTitleText(std::stringstream(), _line, _func);
-
 		MessageBox(NULL, msg.str().c_str(), title.str().c_str(), MB_ICONERROR);
 	}
 

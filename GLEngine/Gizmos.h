@@ -111,7 +111,7 @@ private:
 		GizmoVertex v2;
 	};
 
-	unsigned int	m_shader;
+	unsigned int	m_planeShader;
 
 	// line data
 	unsigned int	m_maxLines;

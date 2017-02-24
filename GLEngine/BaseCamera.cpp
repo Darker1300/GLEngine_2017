@@ -15,6 +15,7 @@ CameraBase::CameraBase()
 	, m_FOV(0.25f)
 	, m_near(0.1f)
 	, m_far(1000.0f)
+	, m_transform()
 {
 	m_aspectRatio = (float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight();
 	UpdateViewFromWorld();

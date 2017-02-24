@@ -18,6 +18,10 @@
 #include "Primatives.h"
 #include "Texture.h"
 
+#include "Shader.h"
+#include "RenderData.h"
+#include "GeometryHelper.h"
+
 ApplicationDemo::ApplicationDemo()
 	: ApplicationBase("Game Engine Demo", 1280, 720) {}
 
@@ -50,8 +54,8 @@ int ApplicationDemo::Start()
 		(float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight(),
 		0.1f, 1000.0f);
 	m_camera->LookAt(
-		glm::vec3(0, 20, 40),
 		glm::vec3(0, 0, 0),
+		glm::vec3(0, 0, -1),
 		glm::vec3(0, 1, 0));
 	//m_camera->SetAsMain();S
 
@@ -63,6 +67,9 @@ int ApplicationDemo::Start()
 	//m_camera->UpdateView();
 	//_bounceDir = 1;
 
+	m_planeRenderData = GeometryHelper::CreateGrid(10, 10, 10, 10, { 1,0.3f,0,1 });
+	m_planeShader = new Shader("./shaders/basic.vert", "./shaders/basic.frag");
+
 	return 0;
 }
 
@@ -70,9 +77,11 @@ int ApplicationDemo::Shutdown()
 {
 	if (ApplicationBase::Shutdown()) return -1;
 
+	delete m_planeShader;
+	delete m_planeRenderData;
 	delete m_tex;
 	delete m_sphere;
-	// delete m_quad;
+	delete m_quad;
 	delete m_camera;
 	delete m_shaderProgram;
 
@@ -109,10 +118,20 @@ int ApplicationDemo::Draw()
 	if (ApplicationBase::Draw()) return -1;
 
 	//glm::mat4 projView = GLE::MAIN_CAM->m_projection * GLE::MAIN_CAM->m_view;
-	glm::mat4 projView = m_camera->GetProjectionView();
+	glm::mat4 projView = m_camera->GetWorldProjectionView();
 
-	m_sphere->DrawMesh(m_shaderProgram, &projView, m_tex);
-	m_quad->DrawMesh(m_shaderProgram, &projView, m_tex);
+
+
+	glUseProgram(m_planeShader->GetProgramID());
+
+	int loc = glGetUniformLocation(m_planeShader->GetProgramID(), "projectionViewWorldMatrix");
+	glUniformMatrix4fv(loc, 1, false, glm::value_ptr(projView));
+
+	m_planeRenderData->Render();
+
+
+	//m_sphere->DrawMesh(m_shaderProgram, &projView, m_tex);
+	//m_quad->DrawMesh(m_shaderProgram, &projView, m_tex);
 
 	return 0;
 }

@@ -12,7 +12,7 @@ namespace GeometryHelper
 			glm::vec4 colour;
 	};
 
-	static RenderData* CreateGrid(const unsigned int _rows, const unsigned int _cols, const float _width, const float _height, const glm::vec4 _colour);
-	static RenderData* CreateQuad(const float _width, const float _height, glm::vec3 facingDirection, const glm::vec4 _colour);
+	RenderData* CreateGrid(const unsigned int _rows, const unsigned int _cols, const float _width, const float _height, const glm::vec4& _colour);
+	RenderData* CreateQuad(const float _width, const float _height, glm::vec3 facingDirection, const glm::vec4& _colour);
 };
 

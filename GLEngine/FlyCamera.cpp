@@ -52,22 +52,22 @@ void FlyCamera::Update(float _deltaTime)
 #pragma endregion
 
 #pragma region Rotation
-	//// Left
-	//if (glfwGetKey(m_window, GLFW_KEY_KP_4)) {
-	//	m_dir -= glm::vec3(1, 0, 0);
-	//}
-	//// Right
-	//if (glfwGetKey(m_window, GLFW_KEY_KP_6)) {
-	//	m_dir += glm::vec3(1, 0, 0);
-	//}
-	//// Up
-	//if (glfwGetKey(m_window, GLFW_KEY_KP_5)) {
-	//	m_dir -= glm::vec3(0, 1, 0);
-	//}
-	//// Down
-	//if (glfwGetKey(m_window, GLFW_KEY_KP_8)) {
-	//	m_dir += glm::vec3(0, 1, 0);
-	//}
+	// Left
+	if (glfwGetKey(m_window, GLFW_KEY_KP_4)) {
+		m_dir -= glm::vec3(1, 0, 0);
+	}
+	// Right
+	if (glfwGetKey(m_window, GLFW_KEY_KP_6)) {
+		m_dir += glm::vec3(1, 0, 0);
+	}
+	// Up
+	if (glfwGetKey(m_window, GLFW_KEY_KP_5)) {
+		m_dir -= glm::vec3(0, 1, 0);
+	}
+	// Down
+	if (glfwGetKey(m_window, GLFW_KEY_KP_8)) {
+		m_dir += glm::vec3(0, 1, 0);
+	}
 	//PrintMat4(transform);
 #pragma endregion
 
@@ -77,11 +77,14 @@ void FlyCamera::Update(float _deltaTime)
 		transform[3] += moveDirection * _deltaTime;
 		SetTransform(transform);
 	}
-	/*float dirlength = glm::length(m_dir);
+	float dirlength = glm::length(m_dir);
 	if (dirlength > 0.0f || dirlength < 0.0f)
 	{
-		AddDirection(glm::normalize(m_dir) * _deltaTime);
-	}*/
+		m_transform.rotation += glm::normalize(m_dir) * _deltaTime * 100;
+
+		//m_worldTransform = glm::inverse(m_transform.WorldMatrix());
+		//UpdateViewFromWorld();
+	}
 }
 
 void FlyCamera::SetSpeed(float _newSpeed)

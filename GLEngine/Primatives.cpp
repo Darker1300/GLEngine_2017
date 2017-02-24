@@ -165,26 +165,25 @@ Mesh * Primatives::Sphere(const float _radius, const unsigned int _rings, const 
 	sphere->m_vertexArray = gl::VertexArray::Create<STD_Vert>(&vertices[0], vertices.size(), &indices[0], indices.size());
 
 	// ----- Set Attribute details -----
-
 	// Bind Array
 	sphere->m_vertexArray->bind();
 
 	// position:
-	// Enable Arrays
+	//		Enable Arrays
 	glEnableVertexAttribArray(0);
-	// Set Attribute pointers
+	//		Set Attribute pointers
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(STD_Vert), (void*)offsetof(STD_Vert, STD_Vert::position));
 
 	// colour:
-	// Enable Arrays
+	//		Enable Arrays
 	glEnableVertexAttribArray(1);
-	// Set Attribute pointers
+	//		Set Attribute pointers
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(STD_Vert), (void*)offsetof(STD_Vert, STD_Vert::colour));
 
 	// texCoord:
-	// Enable Arrays
+	//		Enable Arrays
 	glEnableVertexAttribArray(2);
-	// Set Attribute pointers
+	//		Set Attribute pointers
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(STD_Vert), (void*)offsetof(STD_Vert, STD_Vert::texCoord));
 
 	// Unbind Array

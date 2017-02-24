@@ -1,4 +1,6 @@
 #include "DEBUG_NEW_LEAK_DETECT.h"
+
+#include "DEBUG_WINDOWS_ERR_MSG.h"
 #include "RenderData.h"
 
 #include <gl_core_4_4.h>
@@ -32,9 +34,9 @@ RenderData::RenderData(RenderData && _other)
 
 void RenderData::GenerateBuffers()
 {
-	assert(m_VAO == -1 && "Buffers have already been created.");
-	assert(m_VBO == -1);
-	assert(m_IBO == -1);
+	if (m_VAO != -1 || m_VBO != -1 || m_IBO != -1) {
+		LOG_ERROR("Buffers have already been created.")
+	}
 
 	// Gen
 	glGenVertexArrays(1, &m_VAO);
@@ -57,7 +59,9 @@ void RenderData::Render() const
 
 void RenderData::Bind() const
 {
-	assert(m_VAO == -1 && "You arae binding an invalid buffer.");
+	if (m_VAO == -1) {
+		LOG_ERROR("You are binding an invalid buffer.")
+	}
 	glBindVertexArray(m_VAO);
 }
 
@@ -80,11 +84,3 @@ void RenderData::DestroyBuffers()
 	if (m_IBO != -1)
 		glDeleteBuffers(1, &m_IBO);
 }
-
-// Fill
-// glBufferData(GL_ARRAY_BUFFER, _vertexSize * sizeof(vertexType), _vertexFirst, GL_STATIC_DRAW);
-// // Index
-// glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indexSize * sizeof(unsigned int), _indexFirst, GL_STATIC_DRAW);
-// // Bind VB & IB to VA
-// glBindBuffer(GL_ARRAY_BUFFER, arr->m_B_Vertex_ID);
-// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, arr->m_B_Index_ID);
