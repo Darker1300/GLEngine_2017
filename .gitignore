@@ -4,3 +4,5 @@ GLEngine/Debug/
 *.opendb
 *.db
 *.sdf
+temp/
+*.opensdf

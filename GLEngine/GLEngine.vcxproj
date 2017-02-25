@@ -75,6 +75,7 @@
     <LibraryPath>$(SolutionDir)deps\glfw\lib-vc2015;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)builds\</OutDir>
     <TargetName>$(ProjectName)_$(Configuration)</TargetName>
+    <IntDir>$(SolutionDir)temp\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -85,6 +86,7 @@
     <LibraryPath>$(SolutionDir)deps\glfw\lib-vc2015;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)builds\</OutDir>
     <TargetName>$(ProjectName)_$(Configuration)</TargetName>
+    <IntDir>$(SolutionDir)temp\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
