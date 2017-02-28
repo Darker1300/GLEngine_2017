@@ -113,7 +113,7 @@ typedef struct {
   float brightness;        // base_value in -mm option (default 0)
   float contrast;          // gain_value in -mm option (default 1)
   float origin_offset[3];  // -o u [v [w]] (default 0 0 0)
-  float scale[3];          // -s u [v [w]] (default 1 1 1)
+  float m_scaleLocal[3];          // -s u [v [w]] (default 1 1 1)
   float turbulence[3];     // -t u [v [w]] (default 0 0 0)
   // int   texture_resolution; // -texres resolution (default = ?) TODO
   bool clamp;    // -clamp (default false)
@@ -768,9 +768,9 @@ static bool ParseTextureNameAndOption(std::string *texname,
   texopt->origin_offset[0] = 0.0f;
   texopt->origin_offset[1] = 0.0f;
   texopt->origin_offset[2] = 0.0f;
-  texopt->scale[0] = 1.0f;
-  texopt->scale[1] = 1.0f;
-  texopt->scale[2] = 1.0f;
+  texopt->m_scaleLocal[0] = 1.0f;
+  texopt->m_scaleLocal[1] = 1.0f;
+  texopt->m_scaleLocal[2] = 1.0f;
   texopt->turbulence[0] = 0.0f;
   texopt->turbulence[1] = 0.0f;
   texopt->turbulence[2] = 0.0f;
@@ -800,7 +800,7 @@ static bool ParseTextureNameAndOption(std::string *texname,
                   &(texopt->origin_offset[2]), &token);
     } else if ((0 == strncmp(token, "-s", 2)) && IS_SPACE((token[2]))) {
       token += 3;
-      parseFloat3(&(texopt->scale[0]), &(texopt->scale[1]), &(texopt->scale[2]),
+      parseFloat3(&(texopt->m_scaleLocal[0]), &(texopt->m_scaleLocal[1]), &(texopt->m_scaleLocal[2]),
                   &token, 1.0, 1.0, 1.0);
     } else if ((0 == strncmp(token, "-t", 2)) && IS_SPACE((token[2]))) {
       token += 3;
@@ -1175,7 +1175,7 @@ void LoadMtl(std::map<std::string, int> *material_map,
       continue;
     }
 
-    // PBR: anisotropy rotation
+    // PBR: anisotropy m_rotationLocal
     if ((0 == strncmp(token, "anisor", 6)) && IS_SPACE(token[6])) {
       token += 7;
       material.anisotropy_rotation = parseFloat(&token);

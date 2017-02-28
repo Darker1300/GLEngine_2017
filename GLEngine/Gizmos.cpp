@@ -174,12 +174,12 @@ void Gizmos::clear() {
 }
 
 // Adds 3 unit-length lines (red,green,blue) representing the 3 axis of a transform, 
-// at the transform's translation. Optional scale available.
-void Gizmos::addTransform(const glm::mat4& transform, float scale) {
+// at the transform's translation. Optional m_scaleLocal available.
+void Gizmos::addTransform(const glm::mat4& transform, float m_scaleLocal) {
 
-	glm::vec4 vXAxis = transform[3] + transform[0] * scale;
-	glm::vec4 vYAxis = transform[3] + transform[1] * scale;
-	glm::vec4 vZAxis = transform[3] + transform[2] * scale;
+	glm::vec4 vXAxis = transform[3] + transform[0] * m_scaleLocal;
+	glm::vec4 vYAxis = transform[3] + transform[1] * m_scaleLocal;
+	glm::vec4 vZAxis = transform[3] + transform[2] * m_scaleLocal;
 
 	glm::vec4 vRed(1,0,0,1);
 	glm::vec4 vGreen(0,1,0,1);
@@ -415,7 +415,7 @@ void Gizmos::addDisk(const glm::vec3& center, float radius,
 	}
 }
 
-void Gizmos::addArc(const glm::vec3& center, float rotation,
+void Gizmos::addArc(const glm::vec3& center, float m_rotationLocal,
 	float radius, float arcHalfAngle,
 	unsigned int segments, const glm::vec4& fillColour, const glm::mat4* transform) {
 
@@ -427,8 +427,8 @@ void Gizmos::addArc(const glm::vec3& center, float rotation,
 	float fSegmentSize = (2 * arcHalfAngle) / segments;
 
 	for ( unsigned int i = 0 ; i < segments ; ++i ) {
-		glm::vec3 v1outer( sinf( i * fSegmentSize - arcHalfAngle + rotation ) * radius, 0, cosf( i * fSegmentSize - arcHalfAngle + rotation ) * radius);
-		glm::vec3 v2outer( sinf( (i+1) * fSegmentSize - arcHalfAngle + rotation ) * radius, 0, cosf( (i+1) * fSegmentSize - arcHalfAngle + rotation ) * radius);
+		glm::vec3 v1outer( sinf( i * fSegmentSize - arcHalfAngle + m_rotationLocal ) * radius, 0, cosf( i * fSegmentSize - arcHalfAngle + m_rotationLocal ) * radius);
+		glm::vec3 v2outer( sinf( (i+1) * fSegmentSize - arcHalfAngle + m_rotationLocal ) * radius, 0, cosf( (i+1) * fSegmentSize - arcHalfAngle + m_rotationLocal ) * radius);
 
 		if (transform != nullptr) {
 			v1outer = (*transform * glm::vec4(v1outer, 0)).xyz();
@@ -447,8 +447,8 @@ void Gizmos::addArc(const glm::vec3& center, float rotation,
 
 	// edge lines
 	if (fillColour.w == 0) {
-		glm::vec3 v1outer( sinf( -arcHalfAngle + rotation ) * radius, 0, cosf( -arcHalfAngle + rotation ) * radius );
-		glm::vec3 v2outer( sinf( arcHalfAngle + rotation ) * radius, 0, cosf( arcHalfAngle + rotation ) * radius );
+		glm::vec3 v1outer( sinf( -arcHalfAngle + m_rotationLocal ) * radius, 0, cosf( -arcHalfAngle + m_rotationLocal ) * radius );
+		glm::vec3 v2outer( sinf( arcHalfAngle + m_rotationLocal ) * radius, 0, cosf( arcHalfAngle + m_rotationLocal ) * radius );
 
 		if (transform != nullptr) {
 			v1outer = (*transform * glm::vec4(v1outer, 0)).xyz();
@@ -460,7 +460,7 @@ void Gizmos::addArc(const glm::vec3& center, float rotation,
 	}
 }
 
-void Gizmos::addArcRing(const glm::vec3& center, float rotation, 
+void Gizmos::addArcRing(const glm::vec3& center, float m_rotationLocal, 
 	float innerRadius, float outerRadius, float arcHalfAngle,
 	unsigned int segments, const glm::vec4& fillColour, const glm::mat4* transform) {
 
@@ -472,10 +472,10 @@ void Gizmos::addArcRing(const glm::vec3& center, float rotation,
 	float fSegmentSize = (2 * arcHalfAngle) / segments;
 
 	for ( unsigned int i = 0 ; i < segments ; ++i ) {
-		glm::vec3 v1outer( sinf( i * fSegmentSize - arcHalfAngle + rotation ) * outerRadius, 0, cosf( i * fSegmentSize - arcHalfAngle + rotation ) * outerRadius );
-		glm::vec3 v2outer( sinf( (i+1) * fSegmentSize - arcHalfAngle + rotation ) * outerRadius, 0, cosf( (i+1) * fSegmentSize - arcHalfAngle + rotation ) * outerRadius );
-		glm::vec3 v1inner( sinf( i * fSegmentSize - arcHalfAngle + rotation  ) * innerRadius, 0, cosf( i * fSegmentSize - arcHalfAngle + rotation  ) * innerRadius );
-		glm::vec3 v2inner( sinf( (i+1) * fSegmentSize - arcHalfAngle + rotation  ) * innerRadius, 0, cosf( (i+1) * fSegmentSize - arcHalfAngle + rotation  ) * innerRadius );
+		glm::vec3 v1outer( sinf( i * fSegmentSize - arcHalfAngle + m_rotationLocal ) * outerRadius, 0, cosf( i * fSegmentSize - arcHalfAngle + m_rotationLocal ) * outerRadius );
+		glm::vec3 v2outer( sinf( (i+1) * fSegmentSize - arcHalfAngle + m_rotationLocal ) * outerRadius, 0, cosf( (i+1) * fSegmentSize - arcHalfAngle + m_rotationLocal ) * outerRadius );
+		glm::vec3 v1inner( sinf( i * fSegmentSize - arcHalfAngle + m_rotationLocal  ) * innerRadius, 0, cosf( i * fSegmentSize - arcHalfAngle + m_rotationLocal  ) * innerRadius );
+		glm::vec3 v2inner( sinf( (i+1) * fSegmentSize - arcHalfAngle + m_rotationLocal  ) * innerRadius, 0, cosf( (i+1) * fSegmentSize - arcHalfAngle + m_rotationLocal  ) * innerRadius );
 
 		if (transform != nullptr) {
 			v1outer = (*transform * glm::vec4(v1outer, 0)).xyz();
@@ -500,10 +500,10 @@ void Gizmos::addArcRing(const glm::vec3& center, float rotation,
 
 	// edge lines
 	if (fillColour.w == 0) {
-		glm::vec3 v1outer( sinf( -arcHalfAngle + rotation ) * outerRadius, 0, cosf( -arcHalfAngle + rotation ) * outerRadius );
-		glm::vec3 v2outer( sinf( arcHalfAngle + rotation ) * outerRadius, 0, cosf( arcHalfAngle + rotation ) * outerRadius );
-		glm::vec3 v1inner( sinf( -arcHalfAngle + rotation  ) * innerRadius, 0, cosf( -arcHalfAngle + rotation  ) * innerRadius );
-		glm::vec3 v2inner( sinf( arcHalfAngle + rotation  ) * innerRadius, 0, cosf( arcHalfAngle + rotation  ) * innerRadius );
+		glm::vec3 v1outer( sinf( -arcHalfAngle + m_rotationLocal ) * outerRadius, 0, cosf( -arcHalfAngle + m_rotationLocal ) * outerRadius );
+		glm::vec3 v2outer( sinf( arcHalfAngle + m_rotationLocal ) * outerRadius, 0, cosf( arcHalfAngle + m_rotationLocal ) * outerRadius );
+		glm::vec3 v1inner( sinf( -arcHalfAngle + m_rotationLocal  ) * innerRadius, 0, cosf( -arcHalfAngle + m_rotationLocal  ) * innerRadius );
+		glm::vec3 v2inner( sinf( arcHalfAngle + m_rotationLocal  ) * innerRadius, 0, cosf( arcHalfAngle + m_rotationLocal  ) * innerRadius );
 
 		if (transform != nullptr) {
 			v1outer = (*transform * glm::vec4(v1outer, 0)).xyz();
@@ -581,16 +581,16 @@ void Gizmos::addSphere(const glm::vec3& center, float radius, int rows, int colu
 }
 
 void Gizmos::addCapsule(const glm::vec3& center, float height, float radius,
-						int rows, int cols, const glm::vec4& fillColour, const glm::mat4* rotation) {
+						int rows, int cols, const glm::vec4& fillColour, const glm::mat4* m_rotationLocal) {
 
 	float sphereCenters = (height * 0.5f) - radius;
 	glm::vec4 top = glm::vec4(0, sphereCenters, 0, 0);
 	glm::vec4 bottom = glm::vec4(0, -sphereCenters, 0, 0);
 	glm::vec4 white(1);
 
-	if (rotation) {
-		top = (*rotation) * top + (*rotation)[3];
-		bottom = (*rotation) * bottom + (*rotation)[3];
+	if (m_rotationLocal) {
+		top = (*m_rotationLocal) * top + (*m_rotationLocal)[3];
+		bottom = (*m_rotationLocal) * bottom + (*m_rotationLocal)[3];
 	}
 
 	glm::vec3 topCenter = center + top.xyz();
@@ -625,9 +625,9 @@ void Gizmos::addCapsule(const glm::vec3& center, float height, float radius,
 			glm::vec3 v4Point(-z * sinf(theta), y, -z * cosf(theta));
 			glm::vec3 v4Normal(inverseRadius * v4Point.x, inverseRadius * v4Point.y, inverseRadius * v4Point.z);
 
-			if (rotation != nullptr) {
-				v4Point = (*rotation * glm::vec4(v4Point, 0)).xyz();
-				v4Normal = (*rotation * glm::vec4(v4Normal, 0)).xyz();
+			if (m_rotationLocal != nullptr) {
+				v4Point = (*m_rotationLocal * glm::vec4(v4Point, 0)).xyz();
+				v4Normal = (*m_rotationLocal * glm::vec4(v4Normal, 0)).xyz();
 			}
 
 			int index = row * cols + (col % cols);
@@ -667,9 +667,9 @@ void Gizmos::addCapsule(const glm::vec3& center, float height, float radius,
 		glm::vec4 pos = glm::vec4(cosf(x), 0, sinf(x), 0) * radius;
 		glm::vec4 pos1 = glm::vec4(cosf(x1), 0, sinf(x1), 0) * radius;
 
-		if (rotation) {
-			pos = (*rotation) * pos;
-			pos1 = (*rotation) * pos1;
+		if (m_rotationLocal) {
+			pos = (*m_rotationLocal) * pos;
+			pos1 = (*m_rotationLocal) * pos1;
 		}
 
 		addTri(topCenter + pos1.xyz(), bottomCenter + pos1.xyz(), bottomCenter + pos.xyz(), fillColour);

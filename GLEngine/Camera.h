@@ -20,7 +20,7 @@
 //	void SetDir(glm::vec3 _newDir);
 //	void UpdateView();
 //	
-//	glm::vec3 m_position;
+//	glm::vec3 m_positionLocal;
 //	///<summary>Direction is a unit vector3.</summary>
 //	glm::vec3 m_direction;
 //

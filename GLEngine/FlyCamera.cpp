@@ -80,7 +80,7 @@ void FlyCamera::Update(float _deltaTime)
 	float dirlength = glm::length(m_dir);
 	if (dirlength > 0.0f || dirlength < 0.0f)
 	{
-		m_transform.rotation += glm::normalize(m_dir) * _deltaTime * 100;
+		// m_transform.m_rotationLocal += glm::normalize(m_dir) * _deltaTime * 100;
 
 		//m_worldTransform = glm::inverse(m_transform.WorldMatrix());
 		//UpdateViewFromWorld();

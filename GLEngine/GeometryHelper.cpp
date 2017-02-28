@@ -22,7 +22,7 @@ namespace GeometryHelper {
 			{
 				SimpleVertex& vert = vertices[r * _cols + c];
 				// Pos
-				vert.position = glm::vec4(
+				vert.m_positionLocal = glm::vec4(
 					-(_width / 2) + (colSpacing * c), 0,
 					-(_height / 2) + (rowSpacing * r), 1);
 				// Colour
@@ -64,7 +64,7 @@ namespace GeometryHelper {
 		// Let OpenGL know where to find the data in the vertex
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 4, GL_FLOAT, false, sizeof(SimpleVertex),
-			(char*)offsetof(SimpleVertex, position));
+			(char*)offsetof(SimpleVertex, m_positionLocal));
 
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 4, GL_FLOAT, false, sizeof(SimpleVertex),

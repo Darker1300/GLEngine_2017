@@ -8,7 +8,7 @@ class RenderData;
 namespace GeometryHelper
 {
 	struct SimpleVertex {
-			glm::vec4 position;
+			glm::vec4 m_positionLocal;
 			glm::vec4 colour;
 	};
 

@@ -14,7 +14,7 @@ namespace gl {
 		const static char* const fragmentSource;
 
 		struct Vertex {
-			glm::vec4 position;
+			glm::vec4 m_positionLocal;
 		};
 	};
 

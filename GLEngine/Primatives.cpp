@@ -28,7 +28,7 @@ Mesh * Primatives::Plane(const unsigned int _rows, const unsigned int _cols)
 		{
 			STD_Vert& vert = vertices[r * _cols + c];
 			// Position
-			vert.position = glm::vec4((float)c, 0, (float)r, 1);
+			vert.m_positionLocal = glm::vec4((float)c, 0, (float)r, 1);
 			// TexCoord
 			vert.texCoord = glm::vec2(r * (1.0f / _rows), c * (1.0f / _cols));
 			// Colour
@@ -75,11 +75,11 @@ Mesh * Primatives::Plane(const unsigned int _rows, const unsigned int _cols)
 	// Bind Array
 	plane->m_vertexArray->bind();
 
-	// position:
+	// m_positionLocal:
 	// Enable Arrays
 	glEnableVertexAttribArray(0);
 	// Set Attribute pointers
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(STD_Vert), (void*)offsetof(STD_Vert, STD_Vert::position));
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(STD_Vert), (void*)offsetof(STD_Vert, STD_Vert::m_positionLocal));
 
 	// colour:
 	// Enable Arrays
@@ -128,7 +128,7 @@ Mesh * Primatives::Sphere(const float _radius, const unsigned int _rings, const 
 
 		// Position
 		glm::vec4 pos = glm::vec4(x * _radius, y * _radius, z * _radius, 1);
-		v->position = pos;
+		v->m_positionLocal = pos;
 
 		// Colour
 		glm::vec4 colour = glm::vec4(cosf(y), cosf(y * 10), cosf((y * 10) * x), 1);
@@ -168,11 +168,11 @@ Mesh * Primatives::Sphere(const float _radius, const unsigned int _rings, const 
 	// Bind Array
 	sphere->m_vertexArray->bind();
 
-	// position:
+	// m_positionLocal:
 	//		Enable Arrays
 	glEnableVertexAttribArray(0);
 	//		Set Attribute pointers
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(STD_Vert), (void*)offsetof(STD_Vert, STD_Vert::position));
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(STD_Vert), (void*)offsetof(STD_Vert, STD_Vert::m_positionLocal));
 
 	// colour:
 	//		Enable Arrays

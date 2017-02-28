@@ -55,7 +55,7 @@
 //
 //void Camera::SetPos(glm::vec3 _newPos)
 //{
-//	m_position = _newPos;
+//	m_positionLocal = _newPos;
 //}
 //
 //void Camera::SetDir(glm::vec3 _newDir)
@@ -66,8 +66,8 @@
 //void Camera::UpdateView()
 //{
 //	m_view = glm::lookAt(
-//		m_position,
-//		m_position + m_direction,
+//		m_positionLocal,
+//		m_positionLocal + m_direction,
 //		glm::vec3(0, 1, 0));
 //}
 //

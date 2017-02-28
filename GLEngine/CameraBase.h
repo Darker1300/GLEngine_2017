@@ -35,7 +35,7 @@ public:
 	glm::mat4 GetView() const { return m_viewTransform; }
 	glm::mat4 GetProjection() const { return m_projectionTransform; }
 	glm::mat4 GetProjectionView() const { return m_projectionTransform * m_viewTransform; }
-	glm::mat4 GetWorldProjectionView() { return m_projectionTransform * m_viewTransform * m_transform.WorldMatrix(); }
+	glm::mat4 GetWorldProjectionView() { return m_transform.WorldMatrix()  *m_projectionTransform * m_viewTransform; }
 
 	Transform m_transform;
 protected:

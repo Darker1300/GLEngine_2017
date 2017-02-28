@@ -21,7 +21,7 @@ public:
 	unsigned int m_geometryType;
 
 	struct Vertex {
-		glm::vec4 position;
+		glm::vec4 m_positionLocal;
 		glm::vec4 colour;
 	};
 
