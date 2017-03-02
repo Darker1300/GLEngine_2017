@@ -1,6 +1,6 @@
 #include "DEBUG_NEW_LEAK_DETECT.h"
 
-#define USE_CONSOLE_LOG 1
+// #define USE_CONSOLE_LOG 1
 #include "DEBUG_WINDOWS_ERR_MSG.h"
 
 #include "Shader.h"

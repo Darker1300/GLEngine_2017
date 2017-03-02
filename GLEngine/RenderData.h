@@ -10,7 +10,7 @@ public:
 
 	RenderData& operator=(const RenderData& _other) = delete;
 
-	void GenerateBuffers();
+	void GenerateBuffers(bool _generateIndexBuffer = true);
 	void Render() const;
 	void Bind() const;
 	void Unbind() const;
@@ -39,5 +39,6 @@ private:
 		m_IBO,
 		m_primitiveType,
 		m_indicesSize;
+	bool m_hasIndexBuffer;
 };
 

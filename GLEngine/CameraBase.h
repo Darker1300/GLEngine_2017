@@ -14,11 +14,9 @@ public:
 
 	virtual void Update(float _deltaTime) {};
 
-	void SetPosition(const glm::vec3& _pos);
-	glm::vec3 GetPosition() const { return glm::vec3(m_worldTransform[3].x, m_worldTransform[3].y, m_worldTransform[3].z); }
-
 	// View
-	void LookAt(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _worldUp);
+	// void LookAt(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _worldUp);
+	// void LookAt(const glm::vec3& _target);
 
 	// Perspective
 	void SetPerspective(float _FOV, float _aspectRatio, float _nearDST, float _farDST);
@@ -29,21 +27,13 @@ public:
 	void SetAsMain();
 	static void SetAsMain(CameraBase* _camera);
 
-	glm::mat4 GetTransform() const { return m_worldTransform; }
-	void SetTransform(const glm::mat4& _trans);
-
-	glm::mat4 GetView() const { return m_viewTransform; }
-	glm::mat4 GetProjection() const { return m_projectionTransform; }
-	glm::mat4 GetProjectionView() const { return m_projectionTransform * m_viewTransform; }
-	glm::mat4 GetWorldProjectionView() { return m_transform.WorldMatrix()  *m_projectionTransform * m_viewTransform; }
+	const glm::mat4& GetView() { return m_transform.InverseMatrix(); }
+	const glm::mat4& GetProjection() const { return m_projectionTransform; }
+	glm::mat4 GetProjectionViewWorld() { return GetProjection() * GetView() * m_transform.WorldMatrix(); }
 
 	Transform m_transform;
 protected:
-	void UpdateViewFromWorld();
-	void UpdateWorldFromView();
-
-	void UpdateView();
-	void UpdatePerspective();
+	void CalculatePerspective();
 
 	// Events
 	virtual void OnGainFocus() {}
@@ -52,9 +42,6 @@ protected:
 #ifdef _DEBUG
 	void PrintMat4(const glm::mat4& _transform) const;
 #endif
-	glm::mat4 m_worldTransform;
-
-	glm::mat4 m_viewTransform;
 	glm::mat4 m_projectionTransform;
 
 	float m_FOV, m_aspectRatio, m_near, m_far;

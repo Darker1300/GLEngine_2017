@@ -16,74 +16,65 @@ FlyCamera::~FlyCamera()
 
 void FlyCamera::Update(float _deltaTime)
 {
-	glm::mat4 transform = GetTransform();
-	glm::vec4 vRight = glm::normalize(transform[0]);
-	glm::vec4 vUp = glm::normalize(transform[1]);
-	glm::vec4 vForward = glm::normalize(transform[2]);
-
-	glm::vec4 moveDirection;
-	glm::vec3 m_dir;
+	glm::vec3 m_move;
+	glm::vec3 m_rotate;
 
 #pragma region Movement
-	// Forwards
+	// Forward
 	if (glfwGetKey(m_window, GLFW_KEY_W)) {
-		moveDirection -= (vForward * m_speed);
+		m_move += m_transform.LocalOrientation() * Vector3::forward;
 	}
 	// Backwards
 	if (glfwGetKey(m_window, GLFW_KEY_S)) {
-		moveDirection += (vForward * m_speed);
+		m_move += m_transform.LocalOrientation() * Vector3::backward;
 	}
 	// Right
 	if (glfwGetKey(m_window, GLFW_KEY_A)) {
-		moveDirection -= (vRight * m_speed);
+		m_move += m_transform.LocalOrientation() * Vector3::right;
 	}
 	// Left
 	if (glfwGetKey(m_window, GLFW_KEY_D)) {
-		moveDirection += (vRight * m_speed);
+		m_move += m_transform.LocalOrientation() * Vector3::left;
 	}
 	// Up
 	if (glfwGetKey(m_window, GLFW_KEY_E)) {
-		moveDirection += (vUp * m_speed);
+		m_move += Vector3::up;
 	}
 	// Down
 	if (glfwGetKey(m_window, GLFW_KEY_Q)) {
-		moveDirection -= (vUp * m_speed);
+		m_move += Vector3::down;
 	}
 #pragma endregion
 
 #pragma region Rotation
 	// Left
 	if (glfwGetKey(m_window, GLFW_KEY_KP_4)) {
-		m_dir -= glm::vec3(1, 0, 0);
+		m_rotate += Vector3::down;
 	}
 	// Right
 	if (glfwGetKey(m_window, GLFW_KEY_KP_6)) {
-		m_dir += glm::vec3(1, 0, 0);
+		m_rotate += Vector3::up;
 	}
 	// Up
 	if (glfwGetKey(m_window, GLFW_KEY_KP_5)) {
-		m_dir -= glm::vec3(0, 1, 0);
+		m_rotate += Vector3::right;
 	}
 	// Down
 	if (glfwGetKey(m_window, GLFW_KEY_KP_8)) {
-		m_dir += glm::vec3(0, 1, 0);
+		m_rotate += Vector3::left;
 	}
-	//PrintMat4(transform);
+
 #pragma endregion
 
+	float dirlength = glm::length(m_rotate);
+	bool moved = glm::length(m_move) > 0.0f;
+	bool rotated = dirlength > 0.0f || dirlength < 0.0f;
 	// Apply
-	if (glm::length(moveDirection) > 0.0f)
-	{
-		transform[3] += moveDirection * _deltaTime;
-		SetTransform(transform);
-	}
-	float dirlength = glm::length(m_dir);
-	if (dirlength > 0.0f || dirlength < 0.0f)
-	{
-		// m_transform.m_rotationLocal += glm::normalize(m_dir) * _deltaTime * 100;
-
-		//m_worldTransform = glm::inverse(m_transform.WorldMatrix());
-		//UpdateViewFromWorld();
+	if (moved || rotated) {
+		if (moved)
+			m_transform.Translate(m_move * m_speed * _deltaTime* 0.25f);
+		if (rotated)
+			m_transform.Rotate(m_rotate * _deltaTime * 0.5f);
 	}
 }
 

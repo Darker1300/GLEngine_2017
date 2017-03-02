@@ -295,7 +295,7 @@ void Gizmos::addAABBFilled(const glm::vec3& center,
 	addTri(vVerts[4], vVerts[3], vVerts[0], fillColour);
 	addTri(vVerts[7], vVerts[3], vVerts[4], fillColour);
 
-	// back
+	// backward
 	addTri(vVerts[1], vVerts[2], vVerts[5], fillColour);
 	addTri(vVerts[2], vVerts[6], vVerts[5], fillColour);
 
@@ -664,20 +664,20 @@ void Gizmos::addCapsule(const glm::vec3& center, float height, float radius,
 		x *= 2.0f * glm::pi<float>();
 		x1 *= 2.0f * glm::pi<float>();
 
-		glm::vec4 pos = glm::vec4(cosf(x), 0, sinf(x), 0) * radius;
+		glm::vec4 position = glm::vec4(cosf(x), 0, sinf(x), 0) * radius;
 		glm::vec4 pos1 = glm::vec4(cosf(x1), 0, sinf(x1), 0) * radius;
 
 		if (m_rotationLocal) {
-			pos = (*m_rotationLocal) * pos;
+			position = (*m_rotationLocal) * position;
 			pos1 = (*m_rotationLocal) * pos1;
 		}
 
-		addTri(topCenter + pos1.xyz(), bottomCenter + pos1.xyz(), bottomCenter + pos.xyz(), fillColour);
-		addTri(topCenter + pos1.xyz(), bottomCenter + pos.xyz(), topCenter + pos.xyz(), fillColour);
+		addTri(topCenter + pos1.xyz(), bottomCenter + pos1.xyz(), bottomCenter + position.xyz(), fillColour);
+		addTri(topCenter + pos1.xyz(), bottomCenter + position.xyz(), topCenter + position.xyz(), fillColour);
 
-		addLine(topCenter + pos.xyz(), topCenter + pos1.xyz(), white, white);
-		addLine(bottomCenter + pos.xyz(), bottomCenter + pos1.xyz(), white, white);
-		addLine(topCenter + pos.xyz(), bottomCenter + pos.xyz(), white, white);
+		addLine(topCenter + position.xyz(), topCenter + pos1.xyz(), white, white);
+		addLine(bottomCenter + position.xyz(), bottomCenter + pos1.xyz(), white, white);
+		addLine(topCenter + position.xyz(), bottomCenter + position.xyz(), white, white);
 	}
 }
 
