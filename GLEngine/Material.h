@@ -20,7 +20,7 @@ public:
 	std::map<std::string, Texture*> m_textures;
 
 	void Bind() const;
-	void Unbind() const;
+	static void Unbind();
 
 	void ApplyUniformMat4(const std::string& _name, const glm::mat4& _matrix) const;
 	void ApplyUniformFloat(const std::string& _name, const float& _value) const;

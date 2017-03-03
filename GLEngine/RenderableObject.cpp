@@ -28,9 +28,8 @@ void RenderableObject::Render()
 	}
 }
 
-void RenderableObject::Unbind() const
+void RenderableObject::Unbind()
 {
-	m_material->Unbind();
-	if (m_renderShapes.size() > 0)
-		RenderData::Unbind();
+	Material::Unbind();
+	RenderData::Unbind();
 }

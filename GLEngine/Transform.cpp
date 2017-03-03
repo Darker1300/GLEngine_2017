@@ -115,7 +115,7 @@ glm::vec3 Transform::InverseTransformDirection(const glm::vec3 & _direction)
 
 glm::vec3 Transform::Up()
 {
-	return TransformDirection(Vector3::down);
+	return TransformDirection(Vector3::up);
 }
 
 glm::vec3 Transform::Right()
@@ -268,12 +268,16 @@ void Transform::ValidateWorldOrientation()
 void Transform::InvalidateLocal()
 {
 	invalidLocal = true;
+	invalidWorld = true;
+	invalidWorldInverse = true;
+	InvalidateChildren();
 }
 
 void Transform::InvalidateWorld()
 {
 	invalidWorld = true;
-	invalidLocal = true;
+	invalidWorldInverse = true;
+	InvalidateChildren();
 }
 
 void Transform::InvalidateWorldOrientation()

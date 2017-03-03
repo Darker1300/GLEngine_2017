@@ -32,7 +32,7 @@ void Material::Bind() const
 	}
 }
 
-void Material::Unbind() const
+void Material::Unbind()
 {
 	glUseProgram(0);
 }

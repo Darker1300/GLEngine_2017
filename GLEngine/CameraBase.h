@@ -29,7 +29,7 @@ public:
 
 	const glm::mat4& GetView() { return m_transform.InverseMatrix(); }
 	const glm::mat4& GetProjection() const { return m_projectionTransform; }
-	glm::mat4 GetProjectionViewWorld() { return GetProjection() * GetView() * m_transform.WorldMatrix(); }
+	glm::mat4 GetProjectionView() { return GetProjection() * GetView(); }
 
 	Transform m_transform;
 protected:

@@ -55,6 +55,15 @@ void RenderData::GenerateBuffers(bool _generateIndexBuffer)
 	glBindVertexArray(0);
 }
 
+inline void RenderData::FillIndexBuffer(unsigned int * _first, unsigned _count) const
+{
+	if (!m_hasIndexBuffer) { LOG_ERROR("Tried to fill non-existant index buffer."); return; }
+	// Bind
+	Bind();
+	// Send Indices
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, _count * sizeof(unsigned int), _first, GL_STATIC_DRAW);
+}
+
 void RenderData::Render() const
 {
 	Bind();

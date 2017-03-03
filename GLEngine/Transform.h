@@ -37,10 +37,6 @@ public:
 	const glm::vec3& LocalPosition();
 	/// <summary><para>Get cached local-space Scale Vector3.</para></summary>
 	const glm::vec3& LocalScale();
-
-	// /// <summary><para>Get cached local-space Euler rotation in radians.</para></summary>
-	//const glm::vec3& LocalRotation();
-
 	/// <summary><para>Get valid cached world-space transformation matrix.</para></summary>
 	const glm::quat& LocalOrientation();
 	/// <summary><para>Get valid cached local-space transformation matrix.</para></summary>

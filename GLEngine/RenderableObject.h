@@ -17,7 +17,7 @@ public:
 
 	void Bind() const;
 	void Render();
-	void Unbind() const;
+	static void Unbind();
 
 	Material* m_material;
 	std::vector<RenderData*> m_renderShapes;

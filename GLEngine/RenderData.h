@@ -11,6 +11,11 @@ public:
 	RenderData& operator=(const RenderData& _other) = delete;
 
 	void GenerateBuffers(bool _generateIndexBuffer = true);
+
+	template <typename T>
+	void FillVertexBuffer(T* _first, unsigned _count) const;
+	void FillIndexBuffer(unsigned int* _first, unsigned _count) const;
+
 	void Render() const;
 	void Bind() const;
 	static void Unbind();
@@ -42,3 +47,11 @@ private:
 	bool m_hasIndexBuffer;
 };
 
+template<typename T>
+inline void RenderData::FillVertexBuffer(T * _first, unsigned _count) const
+{
+	// Bind
+	Bind();
+	// Send Vertices
+	glBufferData(GL_ARRAY_BUFFER, _count * sizeof(T), _first, GL_STATIC_DRAW);
+}

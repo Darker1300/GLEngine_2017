@@ -132,7 +132,7 @@ int ApplicationDemo::Update(double _deltaTime)
 
 	// Transformations
 	m_spear->m_transform.Rotate(m_spear->m_transform.Up() * _deltaTime * 0.5f);
-	m_sign->m_transform.Translate({});
+	// m_sign->m_transform.Translate({});
 
 	return 0;
 }
@@ -141,7 +141,7 @@ int ApplicationDemo::Draw()
 {
 	if (ApplicationBase::Draw()) return -1;
 
-	glm::mat4 projView = m_camera->GetProjectionViewWorld();
+	glm::mat4 projView = m_camera->GetProjectionView();
 
 	// Update material
 	m_ground->Bind();
@@ -168,8 +168,6 @@ int ApplicationDemo::Draw()
 	// Render
 	m_spear->Render();
 	m_spear->Unbind();
-
-
 
 	//// Plane
 	//glUseProgram(m_primativeShader->GetProgramID());

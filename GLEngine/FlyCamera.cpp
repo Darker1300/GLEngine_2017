@@ -16,33 +16,33 @@ FlyCamera::~FlyCamera()
 
 void FlyCamera::Update(float _deltaTime)
 {
-	glm::vec3 move;
-	glm::vec3 rotate;
+	glm::vec3 move = glm::vec3(0);
+	glm::vec3 rotate = glm::vec3(0);
 
 #pragma region Movement
 	// Forward
 	if (glfwGetKey(m_window, GLFW_KEY_W)) {
-		move += m_transform.TransformDirection(Vector3::forward);
+		move += Vector3::forward;
 	}
 	// Backwards
 	if (glfwGetKey(m_window, GLFW_KEY_S)) {
-		move += m_transform.TransformDirection(Vector3::backward);
+		move += Vector3::backward;
 	}
 	// Right
 	if (glfwGetKey(m_window, GLFW_KEY_A)) {
-		move += m_transform.TransformDirection(Vector3::right);
+		move += Vector3::right;
 	}
 	// Left
 	if (glfwGetKey(m_window, GLFW_KEY_D)) {
-		move += m_transform.TransformDirection(Vector3::left);
+		move += Vector3::left;
 	}
 	// Up
 	if (glfwGetKey(m_window, GLFW_KEY_E)) {
-		move += m_transform.TransformDirection(Vector3::down);
+		move += Vector3::down;
 	}
 	// Down
 	if (glfwGetKey(m_window, GLFW_KEY_Q)) {
-		move += m_transform.TransformDirection(Vector3::up);
+		move += Vector3::up;
 	}
 #pragma endregion
 
@@ -80,7 +80,7 @@ void FlyCamera::Update(float _deltaTime)
 	// Apply
 	if (moved || rotated) {
 		if (moved)
-			m_transform.Translate(move * m_speed * _deltaTime);
+			m_transform.Translate(move * m_speed * _deltaTime * 0.1f);
 		if (rotated)
 			m_transform.Rotate(rotate * _deltaTime);
 	}
