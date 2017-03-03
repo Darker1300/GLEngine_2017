@@ -48,21 +48,21 @@ Gizmos::Gizmos(unsigned int maxLines, unsigned int maxTris,
 	glShaderSource(fs, 1, (const char**)&fsSource, 0);
 	glCompileShader(fs);
 
-	m_planeShader = glCreateProgram();
-	glAttachShader(m_planeShader, vs);
-	glAttachShader(m_planeShader, fs);
-	glBindAttribLocation(m_planeShader, 0, "Position");
-	glBindAttribLocation(m_planeShader, 1, "Colour");
-	glLinkProgram(m_planeShader);
+	m_primativeShader = glCreateProgram();
+	glAttachShader(m_primativeShader, vs);
+	glAttachShader(m_primativeShader, fs);
+	glBindAttribLocation(m_primativeShader, 0, "Position");
+	glBindAttribLocation(m_primativeShader, 1, "Colour");
+	glLinkProgram(m_primativeShader);
     
 	int success = GL_FALSE;
-    glGetProgramiv(m_planeShader, GL_LINK_STATUS, &success);
+    glGetProgramiv(m_primativeShader, GL_LINK_STATUS, &success);
 	if (success == GL_FALSE) {
 		int infoLogLength = 0;
-		glGetProgramiv(m_planeShader, GL_INFO_LOG_LENGTH, &infoLogLength);
+		glGetProgramiv(m_primativeShader, GL_INFO_LOG_LENGTH, &infoLogLength);
 		char* infoLog = new char[infoLogLength + 1];
         
-		glGetProgramInfoLog(m_planeShader, infoLogLength, 0, infoLog);
+		glGetProgramInfoLog(m_primativeShader, infoLogLength, 0, infoLog);
 		printf("Error: Failed to link Gizmo shader program!\n%s\n", infoLog);
 		delete[] infoLog;
 	}
@@ -151,7 +151,7 @@ Gizmos::~Gizmos() {
 	glDeleteBuffers( 1, &m_2DtriVBO );
 	glDeleteVertexArrays( 1, &m_2DlineVAO );
 	glDeleteVertexArrays( 1, &m_2DtriVAO );
-	glDeleteProgram(m_planeShader);
+	glDeleteProgram(m_primativeShader);
 }
 
 void Gizmos::create(unsigned int maxLines, unsigned int maxTris,
@@ -940,9 +940,9 @@ void Gizmos::draw(const glm::mat4& projectionView) {
 		int shader = 0;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &shader);
 
-		glUseProgram(sm_singleton->m_planeShader);
+		glUseProgram(sm_singleton->m_primativeShader);
 		
-		unsigned int projectionViewUniform = glGetUniformLocation(sm_singleton->m_planeShader,"ProjectionView");
+		unsigned int projectionViewUniform = glGetUniformLocation(sm_singleton->m_primativeShader,"ProjectionView");
 		glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(projectionView));
 
 		if (sm_singleton->m_lineCount > 0) {
@@ -1001,9 +1001,9 @@ void Gizmos::draw2D(const glm::mat4& projection) {
 		int shader = 0;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &shader);
 
-		glUseProgram(sm_singleton->m_planeShader);
+		glUseProgram(sm_singleton->m_primativeShader);
 		
-		unsigned int projectionViewUniform = glGetUniformLocation(sm_singleton->m_planeShader,"ProjectionView");
+		unsigned int projectionViewUniform = glGetUniformLocation(sm_singleton->m_primativeShader,"ProjectionView");
 		glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(projection));
 
 		if (sm_singleton->m_2DlineCount > 0) {

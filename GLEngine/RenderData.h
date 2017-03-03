@@ -13,7 +13,7 @@ public:
 	void GenerateBuffers(bool _generateIndexBuffer = true);
 	void Render() const;
 	void Bind() const;
-	void Unbind() const;
+	static void Unbind();
 
 	unsigned int& GetVAO() { return m_VAO; }
 	unsigned int& GetVBO() { return m_VBO; }

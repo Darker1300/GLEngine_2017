@@ -1,33 +1,82 @@
+#include "DEBUG_NEW_LEAK_DETECT.h"
+#include "DEBUG_WINDOWS_ERR_MSG.h"
+
 #include "Texture.h"
 
 #include <gl_core_4_4.h>
 #include <stb_image.h>
 
-using namespace gl;
-
-Texture::Texture()
+Texture::Texture(const std::string & _path)
+	: m_path(_path)
+	, m_id(-1)
+	, m_width(0)
+	, m_height(0)
+	, m_format(-1)
+	, m_data(nullptr)
 {
+	LoadTexture();
 }
 
 Texture::~Texture()
 {
-	stbi_image_free(m_data);
+	if (m_data != nullptr) stbi_image_free(m_data);
 }
 
-Texture * Texture::Load(const char * const _path)
+Texture::Texture(Texture && _other)
 {
-	Texture* uv = new Texture();
-	uv->m_data = stbi_load(_path,
-		&uv->m_width, &uv->m_height, &uv->m_format, STBI_default);
+	m_id = _other.m_id;
+	m_width = _other.m_width;
+	m_height = _other.m_height;
+	m_format = _other.m_format;
+	m_data = _other.m_data;
+	m_path = _other.m_path;
+	_other.m_id = -1;
+	_other.m_data = nullptr;
+}
 
-	glGenTextures(1, &uv->m_id);
+void Texture::LoadTexture()
+{
+	// Load
+	m_data = stbi_load(m_path.c_str(), &m_width, &m_height, &m_format, STBI_default);
+	if (m_data == nullptr) {
+		LOG_ERROR("STBI failed to load image at:\n ", m_path, ".");
+		return;
+	}
 
-	glBindTexture(GL_TEXTURE_2D, uv->m_id);
+	// Set Color channel structure
+	int internalFormat = 0;
+	switch (m_format)
+	{
+	case 1:
+		internalFormat = GL_RED;
+		break;
+	case 2:
+		internalFormat = GL_RG;
+		break;
+	case 3:
+		internalFormat = GL_RGB;
+		break;
+	case 4:
+		internalFormat = GL_RGBA;
+		break;
+	default:
+		LOG_ERROR("STBI's internal format changed!");
+		break;
+	}
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, uv->m_width, uv->m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, uv->m_data);
-	
+	// Generate
+	glGenTextures(1, &m_id);
+	// Bind
+	glBindTexture(GL_TEXTURE_2D, m_id);
+	// Move to GPU
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, internalFormat, GL_UNSIGNED_BYTE, m_data);
+
+	// Set Textures parameters for currently bound
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	return uv;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+
 }

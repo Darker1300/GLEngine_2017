@@ -16,65 +16,73 @@ FlyCamera::~FlyCamera()
 
 void FlyCamera::Update(float _deltaTime)
 {
-	glm::vec3 m_move;
-	glm::vec3 m_rotate;
+	glm::vec3 move;
+	glm::vec3 rotate;
 
 #pragma region Movement
 	// Forward
 	if (glfwGetKey(m_window, GLFW_KEY_W)) {
-		m_move += m_transform.LocalOrientation() * Vector3::forward;
+		move += m_transform.TransformDirection(Vector3::forward);
 	}
 	// Backwards
 	if (glfwGetKey(m_window, GLFW_KEY_S)) {
-		m_move += m_transform.LocalOrientation() * Vector3::backward;
+		move += m_transform.TransformDirection(Vector3::backward);
 	}
 	// Right
 	if (glfwGetKey(m_window, GLFW_KEY_A)) {
-		m_move += m_transform.LocalOrientation() * Vector3::right;
+		move += m_transform.TransformDirection(Vector3::right);
 	}
 	// Left
 	if (glfwGetKey(m_window, GLFW_KEY_D)) {
-		m_move += m_transform.LocalOrientation() * Vector3::left;
+		move += m_transform.TransformDirection(Vector3::left);
 	}
 	// Up
 	if (glfwGetKey(m_window, GLFW_KEY_E)) {
-		m_move += Vector3::up;
+		move += m_transform.TransformDirection(Vector3::down);
 	}
 	// Down
 	if (glfwGetKey(m_window, GLFW_KEY_Q)) {
-		m_move += Vector3::down;
+		move += m_transform.TransformDirection(Vector3::up);
 	}
 #pragma endregion
 
 #pragma region Rotation
 	// Left
 	if (glfwGetKey(m_window, GLFW_KEY_KP_4)) {
-		m_rotate += Vector3::down;
+		rotate += m_transform.TransformDirection(Vector3::down);
 	}
 	// Right
 	if (glfwGetKey(m_window, GLFW_KEY_KP_6)) {
-		m_rotate += Vector3::up;
+		rotate += m_transform.TransformDirection(Vector3::up);
 	}
 	// Up
 	if (glfwGetKey(m_window, GLFW_KEY_KP_5)) {
-		m_rotate += Vector3::right;
+		rotate += m_transform.TransformDirection(Vector3::right);
 	}
 	// Down
 	if (glfwGetKey(m_window, GLFW_KEY_KP_8)) {
-		m_rotate += Vector3::left;
+		rotate += m_transform.TransformDirection(Vector3::left);
+	}
+	// Roll Left
+	if (glfwGetKey(m_window, GLFW_KEY_KP_7)) {
+		rotate += m_transform.TransformDirection(Vector3::backward);
+	}
+	// Roll Right
+	if (glfwGetKey(m_window, GLFW_KEY_KP_9)) {
+		rotate += m_transform.TransformDirection(Vector3::forward);
 	}
 
 #pragma endregion
 
-	float dirlength = glm::length(m_rotate);
-	bool moved = glm::length(m_move) > 0.0f;
-	bool rotated = dirlength > 0.0f || dirlength < 0.0f;
+	float dirlength = glm::length(rotate);
+	bool moved = glm::length(move) != 0.0f;
+	bool rotated = dirlength != 0.0f;
 	// Apply
 	if (moved || rotated) {
 		if (moved)
-			m_transform.Translate(m_move * m_speed * _deltaTime* 0.25f);
+			m_transform.Translate(move * m_speed * _deltaTime);
 		if (rotated)
-			m_transform.Rotate(m_rotate * _deltaTime * 0.5f);
+			m_transform.Rotate(rotate * _deltaTime);
 	}
 }
 

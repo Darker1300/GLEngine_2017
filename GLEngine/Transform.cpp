@@ -4,7 +4,9 @@
 #include "Transform.h"
 
 #include <glm/gtx/transform.hpp>
-#include <glm/gtx/euler_angles.hpp>
+//#include <glm/gtx/quaternion.hpp>
+//#include <glm/gtc/quaternion.hpp>
+#include <glm\ext.hpp>
 
 static const glm::vec3 Vector3::backward = glm::vec3(0, 0, -1);
 static const glm::vec3 Vector3::down = glm::vec3(0, -1, 0);
@@ -17,8 +19,8 @@ static const glm::vec3 Vector3::zero = glm::vec3(0, 0, 0);
 
 Transform::Transform()
 	: position(0), orientation(), scale(1)
-	, rotMatrix(1), localMatrix(1), worldMatrix(1), inverseMatrix(1)
-	, invalidRotation(true), invalidLocal(true), invalidWorld(true), invalidInverse(true)
+	, localMatrix(1), worldMatrix(1), worldInverseMatrix(1), worldOrientation()
+	, invalidLocal(true), invalidWorld(true), invalidWorldInverse(true), invalidWorldOrientation(true)
 	, parent(this), children()
 {
 }
@@ -37,20 +39,9 @@ const glm::vec3 & Transform::LocalScale()
 	return scale;
 }
 
-//const glm::vec3 & Transform::LocalRotation()
-//{
-//	return rotation;
-//}
-
 const glm::quat & Transform::LocalOrientation()
 {
 	return orientation;
-}
-
-const glm::mat4 & Transform::RotMatrix()
-{
-	ValidateRotation();
-	return rotMatrix;
 }
 
 const glm::mat4 & Transform::LocalMatrix()
@@ -67,8 +58,14 @@ const glm::mat4 & Transform::WorldMatrix()
 
 const glm::mat4 & Transform::InverseMatrix()
 {
-	ValidateInverse();
-	return inverseMatrix;
+	ValidateWorldInverse();
+	return worldInverseMatrix;
+}
+
+const glm::quat & Transform::WorldOrientation()
+{
+	ValidateWorldOrientation();
+	return worldOrientation;
 }
 
 glm::vec3 Transform::WorldPosition()
@@ -76,64 +73,59 @@ glm::vec3 Transform::WorldPosition()
 	return TransformPoint(LocalPosition());
 }
 
-//glm::vec3 Transform::WorldRotation()
-//{
-//	return TransformVector(LocalRotation());
-//}
-
 glm::vec3 Transform::WorldScale()
 {
-	return isRoot() ? LocalScale() : parent->WorldScale() * WorldScale();
+	return isRoot() ? LocalScale() : parent->WorldScale() * LocalScale();
 }
 
 glm::vec3 Transform::TransformPoint(const glm::vec3 & _point)
 {
+	// UNSURE IF WORKING
 	return glm::vec3(WorldMatrix() * glm::vec4(_point, 1.0f));
 }
 
 glm::vec3 Transform::TransformVector(const glm::vec3 & _vector)
 {
+	// UNSURE IF WORKING
 	return glm::vec3(WorldMatrix() * glm::vec4(_vector, 0.0f));
+}
+
+glm::vec3 Transform::TransformDirection(const glm::vec3 & _direction)
+{
+	return _direction * WorldOrientation();
 }
 
 glm::vec3 Transform::InverseTransformPoint(const glm::vec3 & _point)
 {
+	// UNSURE IF WORKING
 	return glm::vec3(LocalMatrix() * (InverseMatrix() * glm::vec4(_point, 1.0f)));
 }
 
 glm::vec3 Transform::InverseTransformVector(const glm::vec3 & _vector)
 {
+	// UNSURE IF WORKING
 	return glm::vec3(LocalMatrix() * (InverseMatrix() * glm::vec4(_vector, 0.0f)));
+}
+
+glm::vec3 Transform::InverseTransformDirection(const glm::vec3 & _direction)
+{
+	// UNSURE IF WORKING
+	return glm::vec3(LocalOrientation() * (glm::inverse(WorldOrientation()) * glm::vec4(_direction, 0.0f)));
 }
 
 glm::vec3 Transform::Up()
 {
-	return glm::normalize(TransformVector(Vector3::up));
+	return TransformDirection(Vector3::down);
 }
 
 glm::vec3 Transform::Right()
 {
-	return glm::normalize(TransformVector(Vector3::right));
+	return TransformDirection(Vector3::right);
 }
 
 glm::vec3 Transform::Forward()
 {
-	return glm::normalize(TransformVector(Vector3::forward));
-}
-
-glm::vec3 Transform::UpLocalAxis()
-{
-	return glm::vec3(RotMatrix()[1]);
-}
-
-glm::vec3 Transform::RightLocalAxis()
-{
-	return glm::vec3(RotMatrix()[0]);
-}
-
-glm::vec3 Transform::ForwardLocalAxis()
-{
-	return glm::vec3(RotMatrix()[2]);
+	return TransformDirection(Vector3::forward);
 }
 
 bool Transform::isRoot() const
@@ -143,7 +135,8 @@ bool Transform::isRoot() const
 
 bool Transform::isChildOf(const Transform * const _parent) const
 {
-	return false;
+	if (parent == _parent) return true;
+	else return (isRoot() ? false : parent->isChildOf(_parent));
 }
 
 void Transform::GetChildren(std::list<Transform*>& _outContainer)
@@ -169,36 +162,58 @@ void Transform::GetHierarchyCount(unsigned int & _outCount)
 void Transform::Translate(const glm::vec3 & _vector)
 {
 	position += _vector;
-	invalidLocal = true;
+	InvalidateLocal();
 }
 
 void Transform::Rotate(const glm::quat & _rot)
 {
 	orientation *= _rot;
-	invalidRotation = true;
+
+	InvalidateLocal();
+	InvalidateWorldOrientation();
 }
 
 void Transform::Rotate(const glm::vec3 & _rot)
 {
-	Rotate(glm::quat(_rot));
+	// Pitch
+	if (_rot.z != 0.0f)
+		orientation *= glm::angleAxis(_rot.z, Vector3::forward);
+	// Yaw
+	if (_rot.x != 0.0f)
+		orientation *= glm::angleAxis(_rot.x, Vector3::right);
+	// Roll
+	if (_rot.y != 0.0f)
+		orientation *= glm::angleAxis(_rot.y, Vector3::up);
+
+	InvalidateLocal();
+	InvalidateWorldOrientation();
 }
 
 void Transform::Scale(const glm::vec3 & _scalar)
 {
 	scale *= _scalar;
-	invalidLocal = true;
+	InvalidateLocal();
 }
 
 void Transform::Scale(const float & _scalar)
 {
 	scale *= _scalar;
-	invalidLocal = true;
+	InvalidateLocal();
 }
 
-void Transform::SetParent(Transform * _parent)
+void Transform::SetParent(Transform * _parent, bool _maintainTransform /*= true*/)
 {
 	if (parent != nullptr)
 		parent->children.remove(this);
+
+	// Maintain scale
+	if (_maintainTransform) {
+		scale = WorldScale() / _parent->WorldScale();
+		InvalidateLocal();
+		orientation = WorldOrientation() * glm::inverse(_parent->WorldOrientation());
+		InvalidateLocal();
+		InvalidateWorldOrientation();
+	}
 
 	parent = _parent;
 
@@ -211,23 +226,12 @@ void Transform::SetParent(Transform * _parent)
 void Transform::DetachChildren()
 {
 	for (auto iter = children.begin(); iter != children.end(); iter++)
-	{
 		(*iter)->SetParent((*iter));
-	}
-}
-
-void Transform::ValidateRotation()
-{
-	if (invalidRotation)
-	{
-		CalculateRotation();
-		invalidRotation = false;
-	}
 }
 
 void Transform::ValidateLocal()
 {
-	if (invalidLocal || invalidRotation)
+	if (invalidLocal)
 	{
 		CalculateLocal();
 		invalidLocal = false;
@@ -236,37 +240,58 @@ void Transform::ValidateLocal()
 
 void Transform::ValidateWorld()
 {
-	if (invalidWorld || invalidLocal || invalidRotation)
+	if (invalidWorld || invalidLocal || invalidWorldOrientation)
 	{
 		CalculateWorld();
 		invalidWorld = false;
 	}
 }
 
-void Transform::ValidateInverse()
+void Transform::ValidateWorldInverse()
 {
-	if (invalidInverse || invalidWorld || invalidLocal || invalidRotation)
+	if (invalidWorldInverse)
 	{
-		CalculateInverse();
-		invalidInverse = false;
+		CalculateWorldInverse();
+		invalidWorldInverse = false;
 	}
 }
 
-void Transform::CalculateRotation()
+void Transform::ValidateWorldOrientation()
 {
-	rotMatrix = glm::mat4_cast(orientation);
+	if (invalidWorldOrientation)
+	{
+		CalculateWorldOrientation();
+		invalidWorldOrientation = false;
+	}
+}
 
-	//rotMatrix = glm::mat4(1);
-	//rotMatrix = glm::rotate(rotMatrix, rotation.z, Vector3::forward);
-	//rotMatrix = glm::rotate(rotMatrix, rotation.x, Vector3::right);
-	//rotMatrix = glm::rotate(rotMatrix, rotation.y, Vector3::up);
+void Transform::InvalidateLocal()
+{
+	invalidLocal = true;
+}
+
+void Transform::InvalidateWorld()
+{
+	invalidWorld = true;
+	invalidLocal = true;
+}
+
+void Transform::InvalidateWorldOrientation()
+{
+	invalidWorldOrientation = true;
+}
+
+void Transform::InvalidateChildren()
+{
+	for (auto iter = children.begin(); iter != children.end(); iter++)
+		(*iter)->InvalidateWorld();
 }
 
 void Transform::CalculateLocal()
 {
 	localMatrix = glm::mat4(1);
 	localMatrix = glm::scale(localMatrix, scale);
-	localMatrix *= RotMatrix();
+	localMatrix *= glm::mat4_cast(LocalOrientation());
 	localMatrix = glm::translate(localMatrix, position);
 }
 
@@ -275,9 +300,14 @@ void Transform::CalculateWorld()
 	worldMatrix = isRoot() ? LocalMatrix() : parent->WorldMatrix() * LocalMatrix();
 }
 
-void Transform::CalculateInverse()
+void Transform::CalculateWorldInverse()
 {
-	inverseMatrix = glm::inverse(WorldMatrix());
+	worldInverseMatrix = glm::inverse(WorldMatrix());
+}
+
+void Transform::CalculateWorldOrientation()
+{
+	worldOrientation = isRoot() ? LocalOrientation() : parent->WorldOrientation() * LocalOrientation();
 }
 
 void Transform::ClampRadians(const glm::vec3 & _source, glm::vec3 & _output) const

@@ -73,7 +73,7 @@ void RenderData::Bind() const
 	glBindVertexArray(m_VAO);
 }
 
-void RenderData::Unbind() const
+void RenderData::Unbind()
 {
 	glBindVertexArray(0);
 }
