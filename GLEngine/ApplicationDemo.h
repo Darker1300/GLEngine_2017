@@ -1,6 +1,6 @@
 #pragma once
 
-class CameraBase;
+class Camera;
 
 class Shader;
 class RenderData;
@@ -25,7 +25,7 @@ public:
 	int Draw();
 
 protected:
-	CameraBase* m_camera;
+	Camera* m_camera;
 
 	Shader* m_primativeShader;
 	Shader* m_basicObjShader;

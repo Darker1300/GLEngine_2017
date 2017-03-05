@@ -11,7 +11,6 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-#include "FlyCamera.h"
 #include "ShaderProgram.h"
 #include "ShaderCollection.h"
 #include "Mesh.h"
@@ -24,6 +23,7 @@
 #include "Transform.h"
 #include "Material.h"
 #include "RenderableObject.h"
+#include "Camera.h"
 
 ApplicationDemo::ApplicationDemo()
 	: ApplicationBase("Game Engine Demo", 1280, 720) {}
@@ -41,14 +41,16 @@ int ApplicationDemo::Start()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	// Turn on Wireframe:
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+	//
 	// Set up Camera
-	m_camera = new FlyCamera(GetWindow(), 10);
-	m_camera->SetPerspective(
-		glm::pi<float>() * 0.25f,
-		(float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight(),
-		0.1f, 1000.0f);
-	m_camera->SetAsMain();
+	m_camera = new Camera();
+	m_camera->position += Vector3::up * 1;
+	m_camera->position -= Vector3::backward * 5;
+	//m_camera->SetPerspective(
+	//	glm::pi<float>() * 0.25f,
+	//	(float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight(),
+	//	0.1f, 1000.0f);
+	//m_camera->SetAsMain();
 
 	// Shaders
 	m_primativeShader = new Shader("./shaders/basic.vert", "./shaders/basic.frag");
@@ -79,12 +81,13 @@ int ApplicationDemo::Start()
 	m_spear = new RenderableObject(m_spearMat, m_spearRenderData);
 
 	// Set Transforms
-	m_spear->m_transform.Scale(1);//0.01f);
-	m_spear->m_transform.Translate(m_spear->m_transform.Up() * -1);
+	m_spear->m_transform.m_scale = Vector3::one;
+	m_spear->m_transform.m_position += Vector3::up * 0.25f;
 
-	m_sign->m_transform.SetParent(&m_spear->m_transform);
-	m_sign->m_transform.Rotate({ 3.14159265f * 0.5f, 0, 0 });
-	m_sign->m_transform.Translate(m_sign->m_transform.Up() * -10);
+	//m_sign->m_transform.SetParent(&m_spear->m_transform);	
+	m_sign->m_transform.SetPitch(glm::radians(90.0f));
+	m_sign->m_transform.m_position += Vector3::backward * 10.0f;
+	m_sign->m_transform.m_position += Vector3::left / 8.0f;
 
 	return 0;
 }
@@ -128,10 +131,11 @@ int ApplicationDemo::Update(double _deltaTime)
 	if (ApplicationBase::Update(_deltaTime)) return -1;
 
 	// Camera controls
-	m_camera->Update((float)_deltaTime);
+	m_camera->UpdateFly(GetWindow(), (float)_deltaTime, 4);
+	// m_camera->Update((float)_deltaTime);
 
 	// Transformations
-	m_spear->m_transform.Rotate(m_spear->m_transform.Up() * _deltaTime * 0.5f);
+	//m_spear->m_transform.Rotate(m_spear->m_transform.Up() * _deltaTime * 0.5f);
 	// m_sign->m_transform.Translate({});
 
 	return 0;
@@ -141,12 +145,12 @@ int ApplicationDemo::Draw()
 {
 	if (ApplicationBase::Draw()) return -1;
 
-	glm::mat4 projView = m_camera->GetProjectionView();
+	glm::mat4 projView = m_camera->GetProjectionViewMatrix();
 
 	// Update material
 	m_ground->Bind();
 	m_groundMat->ApplyUniformMat4("projectionViewMatrix", projView);
-	m_groundMat->ApplyUniformMat4("modelMatrix", m_ground->m_transform.WorldMatrix());
+	m_groundMat->ApplyUniformMat4("modelMatrix", m_ground->m_transform.GetLocalMatrix());
 	// Render
 	m_ground->Render();
 	m_ground->Unbind();
@@ -155,7 +159,7 @@ int ApplicationDemo::Draw()
 	// Update material
 	m_sign->Bind();
 	m_signMat->ApplyUniformMat4("projectionViewMatrix", projView);
-	m_signMat->ApplyUniformMat4("modelMatrix", m_sign->m_transform.WorldMatrix());
+	m_signMat->ApplyUniformMat4("modelMatrix", m_sign->m_transform.GetLocalMatrix());
 	// Render
 	m_sign->Render();
 	m_sign->Unbind();
@@ -164,7 +168,7 @@ int ApplicationDemo::Draw()
 	// Update material
 	m_spear->Bind();
 	m_spearMat->ApplyUniformMat4("projectionViewMatrix", projView);
-	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.WorldMatrix());
+	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.GetLocalMatrix());
 	// Render
 	m_spear->Render();
 	m_spear->Unbind();
