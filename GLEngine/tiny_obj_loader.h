@@ -191,7 +191,7 @@ typedef struct {
   std::vector<std::string> stringValues;
 } tag_t;
 
-// Index struct to support different indices for vtx/normal/texcoord.
+// Index struct to support different indices for vtx/normal/uv.
 // -1 means not used.
 typedef struct {
   int vertex_index;
@@ -1481,7 +1481,7 @@ bool LoadObj(attrib_t *attrib, std::vector<shape_t> *shapes,
       continue;
     }
 
-    // texcoord
+    // uv
     if (token[0] == 'v' && token[1] == 't' && IS_SPACE((token[2]))) {
       token += 3;
       float x, y;
@@ -1787,7 +1787,7 @@ bool LoadObjWithCallback(std::istream &inStream, const callback_t &callback,
       continue;
     }
 
-    // texcoord
+    // uv
     if (token[0] == 'v' && token[1] == 't' && IS_SPACE((token[2]))) {
       token += 3;
       float x, y, z;  // y and z are optional. default = 0.0

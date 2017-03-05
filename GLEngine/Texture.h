@@ -1,24 +1,35 @@
 #pragma once
 
+#include <string>
+class Texture
+{
+public:
+	Texture(const std::string& _path);
+	~Texture();
 
-namespace gl {
+	Texture(const Texture& _other) = delete;
+	Texture(Texture&& _other);
 
-	class Texture
-	{
-	public:
-		Texture();
-		~Texture();
+	Texture& operator=(const Texture& _other) = delete;
 
-		static Texture* Load(const char* const _path);
+#pragma region Getters
+	unsigned int GetID() const { return m_id; }
+	int GetWidth() const { return m_width; }
+	int GetHeight() const { return m_height; }
+	int GetFormat() const { return m_format; }
+	const unsigned char* const GetData() const { return m_data; }
+	const std::string& GetPath() const { return m_path; }
+#pragma endregion Getters
 
+private:
+	void LoadTexture();
 
-		int m_width;
-		int m_height;
-		int m_format;
-		unsigned char* m_data;
+	unsigned int m_id;
+	int m_width,
+		m_height,
+		m_format;
 
-		unsigned int m_id;
+	unsigned char* m_data;
 
-	};
-}
-
+	std::string m_path;
+};

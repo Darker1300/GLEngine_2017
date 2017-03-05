@@ -75,17 +75,11 @@
     <ClCompile Include="ShaderCollection.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RenderData.cpp">
       <Filter>Source Files\GL</Filter>
     </ClCompile>
     <ClCompile Include="tiny_obj_loader.cc">
       <Filter>Source Files\Dependencies</Filter>
-    </ClCompile>
-    <ClCompile Include="GeometryHelper.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files\GL</Filter>
@@ -96,8 +90,20 @@
     <ClCompile Include="VertexArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Loader.cpp">
+      <Filter>Source Files\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryHelper.cpp">
+      <Filter>Source Files\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files\GL</Filter>
+    </ClCompile>
     <ClCompile Include="RenderableObject.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\GL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -134,9 +140,6 @@
     <ClInclude Include="ShaderCollection.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="RenderData.h">
       <Filter>Header Files\GL</Filter>
     </ClInclude>
@@ -145,9 +148,6 @@
     </ClInclude>
     <ClInclude Include="tiny_obj_loader.h">
       <Filter>Header Files\Dependencies</Filter>
-    </ClInclude>
-    <ClInclude Include="GeometryHelper.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>Header Files\GL</Filter>
@@ -158,8 +158,20 @@
     <ClInclude Include="VertexArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Loader.h">
+      <Filter>Header Files\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryHelper.h">
+      <Filter>Header Files\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files\GL</Filter>
+    </ClInclude>
     <ClInclude Include="RenderableObject.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\GL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

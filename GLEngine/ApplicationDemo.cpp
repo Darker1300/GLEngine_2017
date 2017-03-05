@@ -21,6 +21,9 @@
 #include "Shader.h"
 #include "RenderData.h"
 #include "GeometryHelper.h"
+#include "Transform.h"
+#include "Material.h"
+#include "RenderableObject.h"
 
 ApplicationDemo::ApplicationDemo()
 	: ApplicationBase("Game Engine Demo", 1280, 720) {}
@@ -31,44 +34,57 @@ int ApplicationDemo::Start()
 {
 	if (ApplicationBase::Start()) return -1;
 
+	// Set Background color
 	SetBackgroundColor(0.25f, 0.25f, 0.25f);
 
+	// Set DrawMode:
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	// Turn on Wireframe:
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	{
-		using namespace gl;
-#define SHADER_CURRENT SHADER_TEX
-		m_shaderProgram = new ShaderProgram(
-			new VertexShader(SHADER_CURRENT::vertexSource),
-			new FragmentShader(SHADER_CURRENT::fragmentSource),
-			SHADER_CURRENT::uniforms,
-			SHADER_CURRENT::uniformsCount
-		);
-	}
-
+	// Set up Camera
 	m_camera = new FlyCamera(GetWindow(), 10);
-
 	m_camera->SetPerspective(
 		glm::pi<float>() * 0.25f,
 		(float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight(),
 		0.1f, 1000.0f);
-	m_camera->LookAt(
-		glm::vec3(0, 0, 0),
-		glm::vec3(0, 0, -1),
-		glm::vec3(0, 1, 0));
-	//m_camera->SetAsMain();S
+	m_camera->SetAsMain();
 
-	m_quad = Primatives::Plane(20, 20);
-	m_sphere = Primatives::Sphere(4, 33, 33);
-	m_tex = gl::Texture::Load("./textures/ship_ori.png");
-	//m_camera->SetPos({ 0, 20,	50 });
-	//m_camera->SetDir({ 0, -0.5, -1 });
-	//m_camera->UpdateView();
-	//_bounceDir = 1;
+	// Shaders
+	m_primativeShader = new Shader("./shaders/basic.vert", "./shaders/basic.frag");
+	m_basicObjShader = new Shader("./shaders/basicOBJ.vert", "./shaders/basicOBJ.frag");
+	m_texturedObjShader = new Shader("./shaders/ian.vert", "./shaders/ian.frag");
 
-	m_planeRenderData = GeometryHelper::CreateGrid(10, 10, 10, 10, { 1,0.3f,0,1 });
-	m_planeShader = new Shader("./shaders/basic.vert", "./shaders/basic.frag");
+	// Textures
+	m_signDiffuse = new Texture("./textures/ian.png");
+	m_texSpearDiffuse = new Texture("./models/soulspear/soulspear_diffuse.tga");
+
+	// RenderData
+	m_groundRenderData = GeometryHelper::CreatePlane(10, 10, 10, 10, { 0.0f, 0.4f, 0.0f, 1 });
+	m_signRenderData = GeometryHelper::CreatePlane(2, 2, 4, 2, { 0, 0.5f, 1, 1 });
+	m_spearRenderData = GeometryHelper::LoadOBJFromDisk("./models/soulspear/soulspear.obj"); //stanford/dragon
+
+	// Materials
+	m_groundMat = new Material(m_primativeShader);
+	m_spearMat = new Material(m_texturedObjShader);
+	m_signMat = new Material(m_texturedObjShader);
+
+	// Set Textures
+	m_signMat->m_textures["diffuse"] = m_signDiffuse;
+	m_spearMat->m_textures["diffuse"] = m_texSpearDiffuse;
+
+	// RenderableObjects
+	m_ground = new RenderableObject(m_groundMat, std::vector<RenderData*>{ m_groundRenderData });
+	m_sign = new RenderableObject(m_signMat, std::vector<RenderData*>{ m_signRenderData });
+	m_spear = new RenderableObject(m_spearMat, m_spearRenderData);
+
+	// Set Transforms
+	m_spear->m_transform.Scale(1);//0.01f);
+	m_spear->m_transform.Translate(m_spear->m_transform.Up() * -1);
+
+	m_sign->m_transform.SetParent(&m_spear->m_transform);
+	m_sign->m_transform.Rotate({ 3.14159265f * 0.5f, 0, 0 });
+	m_sign->m_transform.Translate(m_sign->m_transform.Up() * -10);
 
 	return 0;
 }
@@ -77,28 +93,33 @@ int ApplicationDemo::Shutdown()
 {
 	if (ApplicationBase::Shutdown()) return -1;
 
-	delete m_planeShader;
-	delete m_planeRenderData;
-	delete m_tex;
-	delete m_sphere;
-	delete m_quad;
-	delete m_camera;
-	delete m_shaderProgram;
+	delete m_spear;
+	delete m_sign;
+	delete m_ground;
 
+	delete m_spearMat;
+	delete m_signMat;
+	delete m_groundMat;
+
+	for (auto data : m_spearRenderData) delete data;
+	delete m_signRenderData;
+	delete m_groundRenderData;
+
+	delete m_texSpearDiffuse;
+	delete m_signDiffuse;
+
+	delete m_texturedObjShader;
+	delete m_basicObjShader;
+	delete m_primativeShader;
+
+	delete m_camera;
 	return 0;
 }
 
 int ApplicationDemo::FixedUpdate(double _deltaTime)
 {
 	if (ApplicationBase::FixedUpdate(_deltaTime)) return -1;
-
-	//// Bounce Camera
-	//static float Range = 0.5;
-	//if (m_camera->m_direction.x > Range || m_camera->m_direction.x < -Range)
-	//	_bounceDir = -_bounceDir;
-	//m_camera->m_direction.x += (float)(_bounceDir * 0.4 * _deltaTime);
-
-
+	//m_signTransform->Rotate({ 0,1 * _deltaTime,0 });
 	return 0;
 }
 
@@ -106,9 +127,12 @@ int ApplicationDemo::Update(double _deltaTime)
 {
 	if (ApplicationBase::Update(_deltaTime)) return -1;
 
+	// Camera controls
 	m_camera->Update((float)_deltaTime);
-	// Bounce Camera
-	/*m_camera->UpdateView();*/
+
+	// Transformations
+	m_spear->m_transform.Rotate(m_spear->m_transform.Up() * _deltaTime * 0.5f);
+	// m_sign->m_transform.Translate({});
 
 	return 0;
 }
@@ -117,21 +141,77 @@ int ApplicationDemo::Draw()
 {
 	if (ApplicationBase::Draw()) return -1;
 
-	//glm::mat4 projView = GLE::MAIN_CAM->m_projection * GLE::MAIN_CAM->m_view;
-	glm::mat4 projView = m_camera->GetWorldProjectionView();
+	glm::mat4 projView = m_camera->GetProjectionView();
+
+	// Update material
+	m_ground->Bind();
+	m_groundMat->ApplyUniformMat4("projectionViewMatrix", projView);
+	m_groundMat->ApplyUniformMat4("modelMatrix", m_ground->m_transform.WorldMatrix());
+	// Render
+	m_ground->Render();
+	m_ground->Unbind();
 
 
+	// Update material
+	m_sign->Bind();
+	m_signMat->ApplyUniformMat4("projectionViewMatrix", projView);
+	m_signMat->ApplyUniformMat4("modelMatrix", m_sign->m_transform.WorldMatrix());
+	// Render
+	m_sign->Render();
+	m_sign->Unbind();
 
-	glUseProgram(m_planeShader->GetProgramID());
 
-	int loc = glGetUniformLocation(m_planeShader->GetProgramID(), "projectionViewWorldMatrix");
-	glUniformMatrix4fv(loc, 1, false, glm::value_ptr(projView));
+	// Update material
+	m_spear->Bind();
+	m_spearMat->ApplyUniformMat4("projectionViewMatrix", projView);
+	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.WorldMatrix());
+	// Render
+	m_spear->Render();
+	m_spear->Unbind();
 
-	m_planeRenderData->Render();
+	//// Plane
+	//glUseProgram(m_primativeShader->GetProgramID());
+	//// Set Uniform
+	//int PVMatLoc1 = glGetUniformLocation(m_primativeShader->GetProgramID(), "projectionViewMatrix");
+	//glUniformMatrix4fv(PVMatLoc1, 1, false, glm::value_ptr(projView));
 
+	//m_groundRenderData->Render();
 
-	//m_sphere->DrawMesh(m_shaderProgram, &projView, m_tex);
-	//m_quad->DrawMesh(m_shaderProgram, &projView, m_tex);
+	//// OBJ
+	//glUseProgram(m_basicObjShader->GetProgramID());
+	//// Set Uniform
+	//int PVMatLoc2 = glGetUniformLocation(m_basicObjShader->GetProgramID(), "projectionViewMatrix");
+	//glUniformMatrix4fv(PVMatLoc2, 1, false, glm::value_ptr(projView));
+	//int modelMatLoc2 = glGetUniformLocation(m_basicObjShader->GetProgramID(), "modelMatrix");
+	//glUniformMatrix4fv(modelMatLoc2, 1, false, glm::value_ptr(m_dragonTransform->WorldMatrix()));
+
+	//for (RenderData*& data : m_spearRenderData)
+	//	data->Render();
+
+	//// Ian
+	//glUseProgram(m_texturedObjShader->GetProgramID());
+
+	//// set texture slot
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, m_signDiffuse->GetID());
+	//// tell the shader where it is 
+	//unsigned int texLoc1 = glGetUniformLocation(m_texturedObjShader->GetProgramID(), "diffuse");
+	//if (texLoc1 < 0) { LOG_ERROR("glGetUniformLocation( diffuse ) failed.") }
+	//glUniform1i(texLoc1, 0);
+
+	//int PVMatLoc3 = glGetUniformLocation(m_texturedObjShader->GetProgramID(), "projectionViewMatrix");
+	//glUniformMatrix4fv(PVMatLoc3, 1, false, glm::value_ptr(projView));
+	//int modelMatLoc3 = glGetUniformLocation(m_texturedObjShader->GetProgramID(), "modelMatrix");
+	//glUniformMatrix4fv(modelMatLoc3, 1, false, glm::value_ptr(m_signTransform->WorldMatrix()));
+
+	//m_signRenderData->Render();
+
+	//// Spear
+	//glBindTexture(GL_TEXTURE_2D, m_texSpearDiffuse->GetID());
+	//// glUniform1i() 0 is for GL_TEXTURE0. 1 is for GL_TEXTURE1
+	//glUniform1i(texLoc1, 0);
+
+	//glUseProgram(0);
 
 	return 0;
 }

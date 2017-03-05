@@ -10,10 +10,15 @@ public:
 
 	RenderData& operator=(const RenderData& _other) = delete;
 
-	void GenerateBuffers();
+	void GenerateBuffers(bool _generateIndexBuffer = true);
+
+	template <typename T>
+	void FillVertexBuffer(T* _first, unsigned _count) const;
+	void FillIndexBuffer(unsigned int* _first, unsigned _count) const;
+
 	void Render() const;
 	void Bind() const;
-	void Unbind() const;
+	static void Unbind();
 
 	unsigned int& GetVAO() { return m_VAO; }
 	unsigned int& GetVBO() { return m_VBO; }
@@ -39,5 +44,14 @@ private:
 		m_IBO,
 		m_primitiveType,
 		m_indicesSize;
+	bool m_hasIndexBuffer;
 };
 
+template<typename T>
+inline void RenderData::FillVertexBuffer(T * _first, unsigned _count) const
+{
+	// Bind
+	Bind();
+	// Send Vertices
+	glBufferData(GL_ARRAY_BUFFER, _count * sizeof(T), _first, GL_STATIC_DRAW);
+}

@@ -168,7 +168,9 @@
     <ClCompile Include="FlyCamera.cpp" />
     <ClCompile Include="GeometryHelper.cpp" />
     <ClCompile Include="Gizmos.cpp" />
+    <ClCompile Include="Loader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Primatives.cpp" />
     <ClCompile Include="RenderableObject.cpp" />
@@ -191,6 +193,8 @@
     <ClInclude Include="DEBUG_NEW_LEAK_DETECT.h" />
     <ClInclude Include="FlyCamera.h" />
     <ClInclude Include="GeometryHelper.h" />
+    <ClInclude Include="Loader.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Primatives.h" />
     <ClInclude Include="RenderableObject.h" />

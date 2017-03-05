@@ -9,16 +9,13 @@
 CameraBase* GLE::MAIN_CAM = nullptr;
 
 CameraBase::CameraBase()
-	: m_worldTransform(1)
-	, m_projectionTransform(1)
-	, m_viewTransform(1)
+	: m_projectionTransform(1)
 	, m_FOV(0.25f)
 	, m_near(0.1f)
 	, m_far(1000.0f)
 	, m_transform()
 {
 	m_aspectRatio = (float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight();
-	UpdateViewFromWorld();
 }
 
 CameraBase::~CameraBase()
@@ -39,18 +36,17 @@ void CameraBase::SetAsMain(CameraBase * _camera)
 	GLE::MAIN_CAM->OnGainFocus();
 }
 
-void CameraBase::SetPosition(const glm::vec3 & _pos)
-{
-	m_worldTransform[3] = glm::vec4(_pos, 1);
-	UpdateViewFromWorld();
-}
-
-void CameraBase::LookAt(const glm::vec3 & _eye, const glm::vec3 & _center, const glm::vec3 & _worldUp)
-{
-	//m_direction = glm::normalize(_center - _eye);
-	m_viewTransform = glm::lookAt(_eye, _center, _worldUp);
-	UpdateWorldFromView();
-}
+//void CameraBase::LookAt(const glm::vec3 & _eye, const glm::vec3 & _center, const glm::vec3 & _worldUp)
+//{
+//	//m_direction = glm::normalize(_center - _eye);
+//	// m_viewTransform = glm::lookAt(_eye, _center, _worldUp);
+//	// UpdateWorldFromView();
+//}
+//
+//void CameraBase::LookAt(const glm::vec3 & _target)
+//{
+//	// m_viewTransform = glm::lookAt(m_transform.TransformPoint(m_transform.LocalPosition()), _target, Vector3::up);
+//}
 
 void CameraBase::SetPerspective(float _FOV, float _aspectRatio, float _nearDST, float _farDST)
 {
@@ -58,50 +54,29 @@ void CameraBase::SetPerspective(float _FOV, float _aspectRatio, float _nearDST, 
 	m_aspectRatio = _aspectRatio;
 	m_near = _nearDST;
 	m_far = _farDST;
-	UpdatePerspective();
+	CalculatePerspective();
 }
 
 void CameraBase::SetFOV(const float _FOV)
 {
 	m_FOV = _FOV;
-	UpdatePerspective();
+	CalculatePerspective();
 }
 
 void CameraBase::SetAspectRatio(const float _aspectRatio)
 {
 	m_aspectRatio = _aspectRatio;
-	UpdatePerspective();
+	CalculatePerspective();
 }
 
 void CameraBase::SetNearFar(const float _nearDST, const float _farDST)
 {
 	m_near = _nearDST;
 	m_far = _farDST;
-	UpdatePerspective();
+	CalculatePerspective();
 }
 
-void CameraBase::SetTransform(const glm::mat4 & _trans)
-{
-	m_worldTransform = _trans;
-	UpdateViewFromWorld();
-}
-
-void CameraBase::UpdateViewFromWorld()
-{
-	m_viewTransform = glm::inverse(m_worldTransform);
-}
-
-void CameraBase::UpdateWorldFromView()
-{
-	m_worldTransform = glm::inverse(m_viewTransform);
-}
-
-void CameraBase::UpdateView()
-{
-
-}
-
-void CameraBase::UpdatePerspective()
+void CameraBase::CalculatePerspective()
 {
 	m_projectionTransform = glm::perspective(m_FOV, m_aspectRatio, m_near, m_far);
 }

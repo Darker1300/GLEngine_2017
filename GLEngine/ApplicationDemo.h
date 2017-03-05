@@ -1,14 +1,16 @@
 #pragma once
 
-class ShaderProgram;
 class CameraBase;
-class Mesh;
-namespace gl { class Texture; };
 
 class Shader;
 class RenderData;
+class Texture;
+class Material;
+class Transform;
+class RenderableObject;
 
 #include "ApplicationBase.h"
+#include <vector>
 
 class ApplicationDemo : public ApplicationBase
 {
@@ -23,13 +25,24 @@ public:
 	int Draw();
 
 protected:
-	Shader* m_planeShader;
-	RenderData* m_planeRenderData;
-
-	ShaderProgram* m_shaderProgram;
 	CameraBase* m_camera;
-	Mesh* m_quad;
-	Mesh* m_sphere;
-	gl::Texture* m_tex;
-	//int _bounceDir;
+
+	Shader* m_primativeShader;
+	Shader* m_basicObjShader;
+	Shader* m_texturedObjShader;
+
+	Texture* m_signDiffuse;
+	Texture* m_texSpearDiffuse;
+
+	RenderData* m_groundRenderData;
+	RenderData* m_signRenderData;
+	std::vector<RenderData*> m_spearRenderData;
+
+	Material* m_groundMat;
+	Material* m_signMat;
+	Material* m_spearMat;
+
+	RenderableObject* m_ground;
+	RenderableObject* m_sign;
+	RenderableObject* m_spear;
 };
