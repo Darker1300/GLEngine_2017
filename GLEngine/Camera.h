@@ -13,8 +13,7 @@ public:
 	Camera();
 	~Camera();
 
-	// INCOMMPLETE: -X:Yaw, Y:Pitch, Z:Roll. Rotated in following order: Z, Y, X -
-
+	// X:Yaw, Y:Pitch, Z:Roll. Rotated in following order: X, Y, Z
 	glm::mat4 GetRotationMatrix();
 	glm::mat4 GetLocalMatrix();
 	glm::mat4 GetViewMatrix();
@@ -27,7 +26,7 @@ public:
 	inline static float ClampRadian(const float& _value);
 
 	union {
-		// Radians
+		// Radians. X:Yaw, Y:Pitch, Z:Roll. Rotated in following order: X, Y, Z
 		glm::vec3 forward;
 		struct { float yaw, pitch, roll; };
 	};

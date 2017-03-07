@@ -34,6 +34,7 @@ public:
 	//inline const float& GetRoll() const { return roll; }
 	//const glm::vec3& GetPosition() const { return position; }
 
+	// X:Yaw, Y:Pitch, Z:Roll. Rotated in following order: X, Y, Z
 	glm::mat4 GetRotationMatrix();
 	glm::mat4 GetLocalMatrix();
 
@@ -51,6 +52,7 @@ public:
 
 	glm::vec3 scale;
 	union {
+		// Radians. X:Yaw, Y:Pitch, Z:Roll. Rotated in following order: X, Y, Z
 		glm::vec3 forward;
 		struct { float yaw, pitch, roll; };
 	};
