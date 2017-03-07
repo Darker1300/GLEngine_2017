@@ -41,16 +41,12 @@ int ApplicationDemo::Start()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	// Turn on Wireframe:
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//
+
 	// Set up Camera
 	m_camera = new Camera();
-	m_camera->position += Vector3::up * 1;
-	m_camera->position -= Vector3::backward * 5;
-	//m_camera->SetPerspective(
-	//	glm::pi<float>() * 0.25f,
-	//	(float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight(),
-	//	0.1f, 1000.0f);
-	//m_camera->SetAsMain();
+	m_camera->position += Vector3::up * 0.5f;
+	m_camera->position += Vector3::backward * 4;
+	 m_camera->yaw += glm::radians(180.0f);
 
 	// Shaders
 	m_primativeShader = new Shader("./shaders/basic.vert", "./shaders/basic.frag");
@@ -81,13 +77,13 @@ int ApplicationDemo::Start()
 	m_spear = new RenderableObject(m_spearMat, m_spearRenderData);
 
 	// Set Transforms
-	m_spear->m_transform.m_scale = Vector3::one;
-	m_spear->m_transform.m_position += Vector3::up * 0.25f;
+	m_spear->m_transform.scale = Vector3::one;
+	m_spear->m_transform.position += Vector3::up * 0.25f;
 
-	//m_sign->m_transform.SetParent(&m_spear->m_transform);	
-	m_sign->m_transform.SetPitch(glm::radians(90.0f));
-	m_sign->m_transform.m_position += Vector3::backward * 10.0f;
-	m_sign->m_transform.m_position += Vector3::left / 8.0f;
+	//		m_sign->m_transform.SetParent(&m_spear->m_transform);	
+	// m_sign->m_transform.SetPitch(glm::radians(90.0f));
+	m_sign->m_transform.position += Vector3::backward * 10.0f;
+	m_sign->m_transform.position += Vector3::left / 8.0f;
 
 	return 0;
 }

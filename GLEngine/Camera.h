@@ -13,17 +13,26 @@ public:
 	Camera();
 	~Camera();
 
+	// INCOMMPLETE: -X:Yaw, Y:Pitch, Z:Roll. Rotated in following order: Z, Y, X -
+
+	glm::mat4 GetRotationMatrix();
+	glm::mat4 GetLocalMatrix();
 	glm::mat4 GetViewMatrix();
 	glm::mat4 GetProjectionMatrix();
-	glm::mat4 GetProjectionViewMatrix();
+	glm::mat4 GetProjectionViewMatrix() { return GetProjectionMatrix() * GetViewMatrix(); }
 
 	void SetClipping(float _near, float _far);
 	void UpdateFly(GLFWwindow* _window, float _deltaTime, float _speed = 1.0f);
 
+	inline static float ClampRadian(const float& _value);
+
+	union {
+		// Radians
+		glm::vec3 forward;
+		struct { float yaw, pitch, roll; };
+	};
 	glm::vec3 position;
-	float m_yaw, m_pitch, m_roll;
 	float m_FOV, m_aspectRatio, m_near, m_far;
 
 private:
-	glm::mat4 GetRotMatrix();
 };

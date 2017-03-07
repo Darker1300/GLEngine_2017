@@ -7,8 +7,7 @@
 Camera* GLE::MAIN_CAM = nullptr;
 
 Camera::Camera()
-	: position()
-	, m_yaw(), m_pitch(), m_roll()
+	: forward(), position()
 	, m_FOV(0.25f), m_aspectRatio(16.0f / 9.0f), m_near(0.001f), m_far(1000.0f)
 {
 }
@@ -18,32 +17,38 @@ Camera::~Camera()
 {
 }
 
+glm::mat4 Camera::GetRotationMatrix()
+{
+	glm::mat4 rotMat = glm::mat4();
+	// rotate around to a given bearing: yaw
+	rotMat = glm::rotate(rotMat, yaw, Vector3::up);
+	// rotate around to a given bearing: pitch
+	rotMat = glm::rotate(rotMat, pitch, Vector3::right);
+	// rotate around to a given bearing: roll
+	rotMat = glm::rotate(rotMat, roll, Vector3::forward);
+	return rotMat;
+}
+
+glm::mat4 Camera::GetLocalMatrix()
+{
+	glm::mat4 local = glm::mat4();
+	// translate
+	local = glm::translate(local, position);
+	// rotate
+	local = local * GetRotationMatrix();
+	return local;
+}
+
 glm::mat4 Camera::GetViewMatrix()
 {
-	glm::mat4 camera = glm::mat4();
-	// translate
-	camera = glm::translate(camera, position);
-
-	// rotate around to a given bearing: yaw
-	camera = glm::rotate(camera, m_yaw, Vector3::up);
-	// rotate around to a given bearing: pitch
-	camera = glm::rotate(camera, m_pitch, Vector3::right);
-	// rotate around to a given bearing: roll
-	camera = glm::rotate(camera, m_roll, Vector3::forward);
-
-	// now get the view matrix by taking the rot inverse
-	return glm::inverse(camera);
+	// get the view matrix by taking the transformation inverse
+	return glm::inverse(GetLocalMatrix());
 }
 
 glm::mat4 Camera::GetProjectionMatrix()
 {
 	return glm::perspective(
 		glm::pi<float>() * m_FOV, m_aspectRatio, m_near, m_far);
-}
-
-glm::mat4 Camera::GetProjectionViewMatrix()
-{
-	return GetProjectionMatrix() * GetViewMatrix();
 }
 
 //void Camera::LookAt(const glm::vec3 & _point)
@@ -59,7 +64,7 @@ glm::mat4 Camera::GetProjectionViewMatrix()
 void Camera::SetClipping(float _near, float _far)
 {
 	m_near = _near;
-	m_far = m_far;
+	m_far = _far;
 }
 
 void Camera::UpdateFly(GLFWwindow* _window, float _deltaTime, float _speed)
@@ -76,11 +81,11 @@ void Camera::UpdateFly(GLFWwindow* _window, float _deltaTime, float _speed)
 	if (glfwGetKey(_window, GLFW_KEY_S)) {
 		move -= Vector3::backward;
 	}
-	// Right
+	// Left
 	if (glfwGetKey(_window, GLFW_KEY_A)) {
 		move += Vector3::left;
 	}
-	// Left
+	// Right
 	if (glfwGetKey(_window, GLFW_KEY_D)) {
 		move += Vector3::right;
 	}
@@ -122,31 +127,24 @@ void Camera::UpdateFly(GLFWwindow* _window, float _deltaTime, float _speed)
 
 #pragma endregion
 
-	float dirlength = glm::length(rotate);
 	bool moved = glm::length(move) != 0.0f;
-	bool rotated = dirlength != 0.0f;
+	bool rotated = glm::length(rotate) != 0.0f;
 	// Apply
 	if (moved || rotated) {
-		if (moved)
-			position += glm::vec3(GetRotMatrix() * glm::vec4(move, 0)) * _deltaTime * _speed;
+		if (moved) {
+			glm::mat4 orientation = GetRotationMatrix();
+			glm::vec3 localMove = glm::vec3(orientation * glm::vec4(move, 0));
+			position += localMove * _deltaTime * _speed;
+		}
 		if (rotated) {
-			m_yaw	+= rotate[0] * _deltaTime * _speed;
-			m_pitch += rotate[1] * _deltaTime * _speed;
-			m_roll	+= rotate[2] * _deltaTime * _speed;
+			yaw		= ClampRadian(yaw	+ rotate[0] * _deltaTime * _speed);
+			pitch	= ClampRadian(pitch	+ rotate[1] * _deltaTime * _speed);
+			roll	= ClampRadian(roll	+ rotate[2] * _deltaTime * _speed);
 		}
 	}
 }
 
-glm::mat4 Camera::GetRotMatrix()
+float Camera::ClampRadian(const float & _value) 
 {
-	glm::mat4 rot = glm::mat4();
-	// roll
-	rot = glm::rotate(rot, m_roll, Vector3::forward);
-	// rotate around to a given bearing: yaw
-	rot = glm::rotate(rot, m_yaw, Vector3::up);
-	// the 'look up' axis, should be orthogonal to the up axis
-	// rotate around to the required head tilt: pitch
-	rot = glm::rotate(rot, m_pitch, Vector3::right);
-
-	return rot;
+	return fmodf(_value, glm::two_pi<float>()); 
 }
