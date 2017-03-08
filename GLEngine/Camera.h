@@ -19,7 +19,7 @@ public:
 	glm::mat4 GetViewMatrix();
 	glm::mat4 GetProjectionMatrix();
 	glm::mat4 GetProjectionViewMatrix() { return GetProjectionMatrix() * GetViewMatrix(); }
-
+	//
 	void SetClipping(float _near, float _far);
 	void UpdateFly(GLFWwindow* _window, float _deltaTime, float _speed = 1.0f);
 
