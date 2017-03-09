@@ -141,6 +141,7 @@ namespace GeometryHelper {
 						v.normal.x = attribs.normals[3 * idx.normal_index + 0];
 						v.normal.y = attribs.normals[3 * idx.normal_index + 1];
 						v.normal.z = attribs.normals[3 * idx.normal_index + 2];
+						v.normal.w = 0;
 					} // texture coordinates
 					if (attribs.texcoords.size() > 0)
 					{
@@ -164,10 +165,12 @@ namespace GeometryHelper {
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
 			glEnableVertexAttribArray(2);
+			glEnableVertexAttribArray(3);
 
 			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(OBJVertex), (void*)offsetof(OBJVertex, OBJVertex::position));
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(OBJVertex), (void*)offsetof(OBJVertex, OBJVertex::normal));
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(OBJVertex), (void*)offsetof(OBJVertex, OBJVertex::uv));
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(OBJVertex), (void*)offsetof(OBJVertex, OBJVertex::uv));
+			glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(OBJVertex), (void*)offsetof(OBJVertex, OBJVertex::normal));
+			glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(OBJVertex), (void*)offsetof(OBJVertex, OBJVertex::tangent));
 
 			renderData->Unbind();
 

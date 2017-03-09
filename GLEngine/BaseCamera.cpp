@@ -6,7 +6,7 @@
 #endif
 #include "ApplicationBase.h"
 
-CameraBase* GLE::MAIN_CAM = nullptr;
+//CameraBase* GLE::MAIN_CAM = nullptr;
 
 CameraBase::CameraBase()
 	: m_projectionTransform(1)
@@ -29,11 +29,11 @@ void CameraBase::SetAsMain()
 
 void CameraBase::SetAsMain(CameraBase * _camera)
 {
-	if (GLE::MAIN_CAM != nullptr)
-		GLE::MAIN_CAM->OnLostFocus();
+	//if (GLE::MAIN_CAM != nullptr)
+	//	GLE::MAIN_CAM->OnLostFocus();
 
-	GLE::MAIN_CAM = _camera;
-	GLE::MAIN_CAM->OnGainFocus();
+	//GLE::MAIN_CAM = _camera;
+	//GLE::MAIN_CAM->OnGainFocus();
 }
 
 //void CameraBase::LookAt(const glm::vec3 & _eye, const glm::vec3 & _center, const glm::vec3 & _worldUp)

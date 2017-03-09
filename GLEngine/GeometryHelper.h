@@ -16,12 +16,14 @@ namespace GeometryHelper
 	};
 
 	struct OBJVertex {
-		// x, y, z
+		// x, y, z, w
 		glm::vec4 position;
-		// nx, ny, nz
-		glm::vec3 normal;
 		// u, v
 		glm::vec2 uv;
+		// nx, ny, nz, nw
+		glm::vec4 normal;
+		// tx, ty, tz, tw
+		glm::vec4 tangent;
 	};
 
 	RenderData* CreatePlane(const unsigned int _rows, const unsigned int _cols, const float _width, const float _height, const glm::vec4& _colour);

@@ -24,6 +24,7 @@
 #include "Transform.h"
 #include "Material.h"
 #include "RenderableObject.h"
+#include "Camera.h"
 
 ApplicationDemo::ApplicationDemo()
 	: ApplicationBase("Game Engine Demo", 1280, 720) {}
@@ -43,21 +44,30 @@ int ApplicationDemo::Start()
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// Set up Camera
-	m_camera = new FlyCamera(GetWindow(), 10);
-	m_camera->SetPerspective(
-		glm::pi<float>() * 0.25f,
-		(float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight(),
-		0.1f, 1000.0f);
+	//m_camera = new FlyCamera(GetWindow(), 10);
+	//m_camera->SetPerspective(
+	//	glm::pi<float>() * 0.25f,
+	//	(float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight(),
+	//	0.1f, 1000.0f);
+	m_camera = new Camera();
+	m_camera->m_direction = Vector3::forward;
+	m_camera->m_position += Vector3::backward * 8;
+	m_camera->m_position += Vector3::up * 4;
+	m_camera->UpdateView();
 	m_camera->SetAsMain();
 
 	// Shaders
 	m_primativeShader = new Shader("./shaders/basic.vert", "./shaders/basic.frag");
 	m_basicObjShader = new Shader("./shaders/basicOBJ.vert", "./shaders/basicOBJ.frag");
-	m_texturedObjShader = new Shader("./shaders/ian.vert", "./shaders/ian.frag");
+	m_tintTexObjShader = new Shader("./shaders/ian.vert", "./shaders/ian.frag");
+	m_texObjShader = new Shader("./shaders/texOBJ.vert", "./shaders/texOBJ.frag");
 
 	// Textures
 	m_signDiffuse = new Texture("./textures/ian.png");
 	m_texSpearDiffuse = new Texture("./models/soulspear/soulspear_diffuse.tga");
+	m_texSpearSpecular = new Texture("./models/soulspear/soulspear_specular.tga");
+	m_texSpearNormal = new Texture("./models/soulspear/soulspear_normal.tga");
+
 
 	// RenderData
 	m_groundRenderData = GeometryHelper::CreatePlane(10, 10, 10, 10, { 0.0f, 0.4f, 0.0f, 1 });
@@ -66,12 +76,15 @@ int ApplicationDemo::Start()
 
 	// Materials
 	m_groundMat = new Material(m_primativeShader);
-	m_spearMat = new Material(m_texturedObjShader);
-	m_signMat = new Material(m_texturedObjShader);
+	m_spearMat = new Material(m_texObjShader);
+	m_signMat = new Material(m_tintTexObjShader);
 
 	// Set Textures
 	m_signMat->m_textures["diffuse"] = m_signDiffuse;
-	m_spearMat->m_textures["diffuse"] = m_texSpearDiffuse;
+
+	m_spearMat->m_textures["normal"] = m_texSpearNormal;
+	m_spearMat->m_textures["kD"] = m_texSpearDiffuse;
+	m_spearMat->m_textures["kS"] = m_texSpearSpecular;
 
 	// RenderableObjects
 	m_ground = new RenderableObject(m_groundMat, std::vector<RenderData*>{ m_groundRenderData });
@@ -79,12 +92,12 @@ int ApplicationDemo::Start()
 	m_spear = new RenderableObject(m_spearMat, m_spearRenderData);
 
 	// Set Transforms
-	m_spear->m_transform.Scale(1);//0.01f);
-	m_spear->m_transform.Translate(m_spear->m_transform.Up() * -1);
+	//m_spear->m_transform.Scale(1);//0.01f);
+	m_spear->m_transform.Translate(m_spear->m_transform.Up() * 1);
 
 	m_sign->m_transform.SetParent(&m_spear->m_transform);
-	m_sign->m_transform.Rotate({ 3.14159265f * 0.5f, 0, 0 });
-	m_sign->m_transform.Translate(m_sign->m_transform.Up() * -10);
+	//	m_sign->m_transform.Rotate({ 3.14159265f * 0.5f, 0, 0 });
+	m_sign->m_transform.Translate(m_sign->m_transform.Up() * 10);
 
 	return 0;
 }
@@ -105,10 +118,14 @@ int ApplicationDemo::Shutdown()
 	delete m_signRenderData;
 	delete m_groundRenderData;
 
+	delete m_texSpearNormal;
+	delete m_texSpearSpecular;
 	delete m_texSpearDiffuse;
+
 	delete m_signDiffuse;
 
-	delete m_texturedObjShader;
+	delete m_texObjShader;
+	delete m_tintTexObjShader;
 	delete m_basicObjShader;
 	delete m_primativeShader;
 
@@ -128,7 +145,9 @@ int ApplicationDemo::Update(double _deltaTime)
 	if (ApplicationBase::Update(_deltaTime)) return -1;
 
 	// Camera controls
-	m_camera->Update((float)_deltaTime);
+	//m_camera->Update((float)_deltaTime);
+	m_camera->UpdateFly((float)_deltaTime);
+	m_camera->UpdateView();
 
 	// Transformations
 	m_spear->m_transform.Rotate(m_spear->m_transform.Up() * _deltaTime * 0.5f);
@@ -141,7 +160,7 @@ int ApplicationDemo::Draw()
 {
 	if (ApplicationBase::Draw()) return -1;
 
-	glm::mat4 projView = m_camera->GetProjectionView();
+	glm::mat4 projView = m_camera->m_projection * m_camera->m_view;
 
 	// Update material
 	m_ground->Bind();
@@ -161,10 +180,16 @@ int ApplicationDemo::Draw()
 	m_sign->Unbind();
 
 
+	glm::vec3 lPos = glm::vec3(-5, 5, 0);
+	glm::vec3 lightDir(sin(glfwGetTime()), 1, cos(glfwGetTime()));
+
 	// Update material
 	m_spear->Bind();
 	m_spearMat->ApplyUniformMat4("projectionViewMatrix", projView);
 	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.WorldMatrix());
+	// m_spearMat->ApplyUniformVec3("camPos", m_camera->m_position);
+	// m_spearMat->ApplyUniformVec3("L", glm::normalize(lPos - m_camera->m_position));
+	m_spearMat->ApplyUniformVec3("lightDirection", lightDir);
 	// Render
 	m_spear->Render();
 	m_spear->Unbind();
@@ -189,19 +214,19 @@ int ApplicationDemo::Draw()
 	//	data->Render();
 
 	//// Ian
-	//glUseProgram(m_texturedObjShader->GetProgramID());
+	//glUseProgram(m_tintTexObjShader->GetProgramID());
 
 	//// set texture slot
 	//glActiveTexture(GL_TEXTURE0);
 	//glBindTexture(GL_TEXTURE_2D, m_signDiffuse->GetID());
 	//// tell the shader where it is 
-	//unsigned int texLoc1 = glGetUniformLocation(m_texturedObjShader->GetProgramID(), "diffuse");
+	//unsigned int texLoc1 = glGetUniformLocation(m_tintTexObjShader->GetProgramID(), "diffuse");
 	//if (texLoc1 < 0) { LOG_ERROR("glGetUniformLocation( diffuse ) failed.") }
 	//glUniform1i(texLoc1, 0);
 
-	//int PVMatLoc3 = glGetUniformLocation(m_texturedObjShader->GetProgramID(), "projectionViewMatrix");
+	//int PVMatLoc3 = glGetUniformLocation(m_tintTexObjShader->GetProgramID(), "projectionViewMatrix");
 	//glUniformMatrix4fv(PVMatLoc3, 1, false, glm::value_ptr(projView));
-	//int modelMatLoc3 = glGetUniformLocation(m_texturedObjShader->GetProgramID(), "modelMatrix");
+	//int modelMatLoc3 = glGetUniformLocation(m_tintTexObjShader->GetProgramID(), "modelMatrix");
 	//glUniformMatrix4fv(modelMatLoc3, 1, false, glm::value_ptr(m_signTransform->WorldMatrix()));
 
 	//m_signRenderData->Render();

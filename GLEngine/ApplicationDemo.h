@@ -1,6 +1,7 @@
 #pragma once
 
 class CameraBase;
+class Camera;
 
 class Shader;
 class RenderData;
@@ -25,14 +26,18 @@ public:
 	int Draw();
 
 protected:
-	CameraBase* m_camera;
+	Camera* m_camera;
 
 	Shader* m_primativeShader;
 	Shader* m_basicObjShader;
-	Shader* m_texturedObjShader;
+	Shader* m_tintTexObjShader;
+	Shader* m_texObjShader;
 
 	Texture* m_signDiffuse;
+
 	Texture* m_texSpearDiffuse;
+	Texture* m_texSpearSpecular;
+	Texture* m_texSpearNormal;
 
 	RenderData* m_groundRenderData;
 	RenderData* m_signRenderData;
