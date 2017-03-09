@@ -11,7 +11,6 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-#include "FlyCamera.h"
 #include "ShaderProgram.h"
 #include "ShaderCollection.h"
 #include "Mesh.h"
@@ -174,7 +173,7 @@ int ApplicationDemo::Draw()
 	// Update material
 	m_sign->Bind();
 	m_signMat->ApplyUniformMat4("projectionViewMatrix", projView);
-	m_signMat->ApplyUniformMat4("modelMatrix", m_sign->m_transform.WorldMatrix());
+	m_signMat->ApplyUniformMat4("modelMatrix", m_sign->m_transform.GetLocalMatrix());
 	// Render
 	m_sign->Render();
 	m_sign->Unbind();
@@ -186,10 +185,14 @@ int ApplicationDemo::Draw()
 	// Update material
 	m_spear->Bind();
 	m_spearMat->ApplyUniformMat4("projectionViewMatrix", projView);
+<<<<<<< HEAD
 	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.WorldMatrix());
 	// m_spearMat->ApplyUniformVec3("camPos", m_camera->m_position);
 	// m_spearMat->ApplyUniformVec3("L", glm::normalize(lPos - m_camera->m_position));
 	m_spearMat->ApplyUniformVec3("lightDirection", lightDir);
+=======
+	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.GetLocalMatrix());
+>>>>>>> 85f3eb442c66dc4d06e1546c50ab25e789567523
 	// Render
 	m_spear->Render();
 	m_spear->Unbind();
