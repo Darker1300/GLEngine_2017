@@ -4,7 +4,7 @@
 class Texture
 {
 public:
-	Texture(const std::string& _path);
+	Texture(const std::string& _path, const bool _flipY = true);
 	~Texture();
 
 	Texture(const Texture& _other) = delete;
@@ -30,6 +30,7 @@ private:
 		m_format;
 
 	unsigned char* m_data;
+	bool m_flipY;
 
 	std::string m_path;
 };

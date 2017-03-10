@@ -6,3 +6,4 @@ GLEngine/Debug/
 *.sdf
 temp/
 *.opensdf
+/.vs/GLEngine/v14/.suo

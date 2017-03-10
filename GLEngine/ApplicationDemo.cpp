@@ -24,6 +24,7 @@
 #include "Material.h"
 #include "RenderableObject.h"
 #include "Camera.h"
+#include "Light.h"
 
 ApplicationDemo::ApplicationDemo()
 	: ApplicationBase("Game Engine Demo", 1280, 720) {}
@@ -43,17 +44,11 @@ int ApplicationDemo::Start()
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// Set up Camera
-	//m_camera = new FlyCamera(GetWindow(), 10);
-	//m_camera->SetPerspective(
-	//	glm::pi<float>() * 0.25f,
-	//	(float)GLE::APP->GetWindowWidth() / (float)GLE::APP->GetWindowHeight(),
-	//	0.1f, 1000.0f);
 	m_camera = new Camera();
-	m_camera->m_direction = Vector3::forward;
-	m_camera->m_position += Vector3::backward * 8;
-	m_camera->m_position += Vector3::up * 4;
-	m_camera->UpdateView();
-	m_camera->SetAsMain();
+	m_camera->position += Vector3::backward * 8;
+	m_camera->position += Vector3::up * 4;
+	m_camera->yaw += glm::radians(180.f);
+	//m_camera->SetAsMain();
 
 	// Shaders
 	m_primativeShader = new Shader("./shaders/basic.vert", "./shaders/basic.frag");
@@ -66,7 +61,6 @@ int ApplicationDemo::Start()
 	m_texSpearDiffuse = new Texture("./models/soulspear/soulspear_diffuse.tga");
 	m_texSpearSpecular = new Texture("./models/soulspear/soulspear_specular.tga");
 	m_texSpearNormal = new Texture("./models/soulspear/soulspear_normal.tga");
-
 
 	// RenderData
 	m_groundRenderData = GeometryHelper::CreatePlane(10, 10, 10, 10, { 0.0f, 0.4f, 0.0f, 1 });
@@ -81,22 +75,24 @@ int ApplicationDemo::Start()
 	// Set Textures
 	m_signMat->m_textures["diffuse"] = m_signDiffuse;
 
-	m_spearMat->m_textures["normal"] = m_texSpearNormal;
-	m_spearMat->m_textures["kD"] = m_texSpearDiffuse;
-	m_spearMat->m_textures["kS"] = m_texSpearSpecular;
+	m_spearMat->m_textures["normalMap"] = m_texSpearNormal;
+	m_spearMat->m_textures["diffuseMap"] = m_texSpearDiffuse;
+	m_spearMat->m_textures["specularMap"] = m_texSpearSpecular;
 
 	// RenderableObjects
 	m_ground = new RenderableObject(m_groundMat, std::vector<RenderData*>{ m_groundRenderData });
 	m_sign = new RenderableObject(m_signMat, std::vector<RenderData*>{ m_signRenderData });
 	m_spear = new RenderableObject(m_spearMat, m_spearRenderData);
 
-	// Set Transforms
-	//m_spear->m_transform.Scale(1);//0.01f);
-	m_spear->m_transform.Translate(m_spear->m_transform.Up() * 1);
+	m_lightAlpha = new Light();
 
-	m_sign->m_transform.SetParent(&m_spear->m_transform);
+	// Set Transforms
+	//m_spear->m_transform.scale = {1};//0.01f};
+	m_spear->m_transform.position += Vector3::up * 1;
+
+	//m_sign->m_transform.SetParent(&m_spear->m_transform);
 	//	m_sign->m_transform.Rotate({ 3.14159265f * 0.5f, 0, 0 });
-	m_sign->m_transform.Translate(m_sign->m_transform.Up() * 10);
+	m_sign->m_transform.position += Vector3::up * 10; //.Translate(m_sign->m_transform.Up() * 10);
 
 	return 0;
 }
@@ -104,6 +100,8 @@ int ApplicationDemo::Start()
 int ApplicationDemo::Shutdown()
 {
 	if (ApplicationBase::Shutdown()) return -1;
+
+	delete m_lightAlpha;
 
 	delete m_spear;
 	delete m_sign;
@@ -144,13 +142,12 @@ int ApplicationDemo::Update(double _deltaTime)
 	if (ApplicationBase::Update(_deltaTime)) return -1;
 
 	// Camera controls
-	//m_camera->Update((float)_deltaTime);
-	m_camera->UpdateFly((float)_deltaTime);
-	m_camera->UpdateView();
+	m_camera->UpdateFly(GetWindow(), (float)_deltaTime, 3, 1);
 
 	// Transformations
-	m_spear->m_transform.Rotate(m_spear->m_transform.Up() * _deltaTime * 0.5f);
-	// m_sign->m_transform.Translate({});
+	//m_spear->m_transform.AddYaw((float)_deltaTime * 0.5f);
+	m_lightAlpha->m_transform.position.x = sinf(glfwGetTime()) * 5;
+	m_lightAlpha->m_transform.position.z = cosf(glfwGetTime()) * 5;
 
 	return 0;
 }
@@ -159,16 +156,15 @@ int ApplicationDemo::Draw()
 {
 	if (ApplicationBase::Draw()) return -1;
 
-	glm::mat4 projView = m_camera->m_projection * m_camera->m_view;
+	glm::mat4 projView = m_camera->GetProjectionViewMatrix();
 
 	// Update material
 	m_ground->Bind();
 	m_groundMat->ApplyUniformMat4("projectionViewMatrix", projView);
-	m_groundMat->ApplyUniformMat4("modelMatrix", m_ground->m_transform.WorldMatrix());
+	m_groundMat->ApplyUniformMat4("modelMatrix", m_ground->m_transform.GetLocalMatrix());
 	// Render
 	m_ground->Render();
-	m_ground->Unbind();
-
+	RenderableObject::Unbind();
 
 	// Update material
 	m_sign->Bind();
@@ -176,26 +172,26 @@ int ApplicationDemo::Draw()
 	m_signMat->ApplyUniformMat4("modelMatrix", m_sign->m_transform.GetLocalMatrix());
 	// Render
 	m_sign->Render();
-	m_sign->Unbind();
+	RenderableObject::Unbind();
 
-
-	glm::vec3 lPos = glm::vec3(-5, 5, 0);
-	glm::vec3 lightDir(sin(glfwGetTime()), 1, cos(glfwGetTime()));
+	glm::vec3 lightPos = m_lightAlpha->m_transform.position; //  glm::vec3(-5, 5, 0);
+	glm::vec3 lightDir = m_lightAlpha->GetDirection(m_camera->position);
 
 	// Update material
 	m_spear->Bind();
 	m_spearMat->ApplyUniformMat4("projectionViewMatrix", projView);
-<<<<<<< HEAD
-	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.WorldMatrix());
-	// m_spearMat->ApplyUniformVec3("camPos", m_camera->m_position);
-	// m_spearMat->ApplyUniformVec3("L", glm::normalize(lPos - m_camera->m_position));
-	m_spearMat->ApplyUniformVec3("lightDirection", lightDir);
-=======
 	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.GetLocalMatrix());
->>>>>>> 85f3eb442c66dc4d06e1546c50ab25e789567523
+	m_spearMat->ApplyUniformVec3("cameraPos", m_camera->position);
+	m_spearMat->ApplyUniformVec3("lightDir", lightDir);
+	// m_spearMat->ApplyUniformFloat("roughness", 0.5f);
+
+
+
+	//m_spearMat->ApplyUniformVec3("L", glm::normalize(lPos - m_camera->m_position));
+	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.GetLocalMatrix());
 	// Render
 	m_spear->Render();
-	m_spear->Unbind();
+	RenderableObject::Unbind();
 
 	//// Plane
 	//glUseProgram(m_primativeShader->GetProgramID());

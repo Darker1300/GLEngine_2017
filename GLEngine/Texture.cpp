@@ -6,13 +6,14 @@
 #include <gl_core_4_4.h>
 #include <stb_image.h>
 
-Texture::Texture(const std::string & _path)
+Texture::Texture(const std::string & _path, const bool _flipY /*= true*/)
 	: m_path(_path)
 	, m_id(-1)
 	, m_width(0)
 	, m_height(0)
 	, m_format(-1)
 	, m_data(nullptr)
+	, m_flipY(_flipY)
 {
 	LoadTexture();
 }
@@ -36,6 +37,8 @@ Texture::Texture(Texture && _other)
 
 void Texture::LoadTexture()
 {
+	// Set Y flip option
+	stbi_set_flip_vertically_on_load(m_flipY);
 	// Load
 	m_data = stbi_load(m_path.c_str(), &m_width, &m_height, &m_format, STBI_default);
 	if (m_data == nullptr) {

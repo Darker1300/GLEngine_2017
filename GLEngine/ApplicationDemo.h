@@ -9,6 +9,7 @@ class Texture;
 class Material;
 class Transform;
 class RenderableObject;
+class Light;
 
 #include "ApplicationBase.h"
 #include <vector>
@@ -50,4 +51,6 @@ protected:
 	RenderableObject* m_ground;
 	RenderableObject* m_sign;
 	RenderableObject* m_spear;
+
+	Light* m_lightAlpha;
 };

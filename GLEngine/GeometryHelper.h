@@ -24,11 +24,16 @@ namespace GeometryHelper
 		glm::vec4 normal;
 		// tx, ty, tz, tw
 		glm::vec4 tangent;
+		// btx, bty, btz, btw
+		glm::vec4 bitangent;
 	};
 
 	RenderData* CreatePlane(const unsigned int _rows, const unsigned int _cols, const float _width, const float _height, const glm::vec4& _colour);
 	RenderData* CreateQuad(const float _width, const float _height, glm::vec3 facingDirection, const glm::vec4& _colour);
 
 	std::vector<RenderData*> LoadOBJFromDisk(const std::string& _path);
+	void CalculateTangents(std::vector<OBJVertex>& vertices);
+
+
 };
 

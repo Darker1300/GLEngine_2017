@@ -67,7 +67,7 @@ void Camera::SetClipping(float _near, float _far)
 	m_far = _far;
 }
 
-void Camera::UpdateFly(GLFWwindow* _window, float _deltaTime, float _speed)
+void Camera::UpdateFly(GLFWwindow* _window, float _deltaTime, float _moveSpeed, float _rotSpeed)
 {
 	glm::vec3 move = glm::vec3(0);
 	glm::vec3 rotate = glm::vec3(0);
@@ -134,12 +134,12 @@ void Camera::UpdateFly(GLFWwindow* _window, float _deltaTime, float _speed)
 		if (moved) {
 			glm::mat4 orientation = GetRotationMatrix();
 			glm::vec3 localMove = glm::vec3(orientation * glm::vec4(move, 0));
-			position += localMove * _deltaTime * _speed;
+			position += localMove * _deltaTime * _moveSpeed;
 		}
 		if (rotated) {
-			yaw		= ClampRadian(yaw	+ rotate[0] * _deltaTime * _speed);
-			pitch	= ClampRadian(pitch	+ rotate[1] * _deltaTime * _speed);
-			roll	= ClampRadian(roll	+ rotate[2] * _deltaTime * _speed);
+			yaw		= ClampRadian(yaw	+ rotate[0] * _deltaTime * _rotSpeed);
+			pitch	= ClampRadian(pitch	+ rotate[1] * _deltaTime * _rotSpeed);
+			roll	= ClampRadian(roll	+ rotate[2] * _deltaTime * _rotSpeed);
 		}
 	}
 }

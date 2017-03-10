@@ -19,9 +19,9 @@ public:
 	glm::mat4 GetViewMatrix();
 	glm::mat4 GetProjectionMatrix();
 	glm::mat4 GetProjectionViewMatrix() { return GetProjectionMatrix() * GetViewMatrix(); }
-	//
+
 	void SetClipping(float _near, float _far);
-	void UpdateFly(GLFWwindow* _window, float _deltaTime, float _speed = 1.0f);
+	void UpdateFly(GLFWwindow* _window, float _deltaTime, float _moveSpeed = 1.0f, float _rotSpeed = 1.0f);
 
 	inline static float ClampRadian(const float& _value);
 
