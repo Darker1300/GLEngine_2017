@@ -147,8 +147,8 @@ int ApplicationDemo::Update(double _deltaTime)
 
 	// Transformations
 	//m_spear->m_transform.AddYaw((float)_deltaTime * 0.5f);
-	m_lightAlpha->m_transform.position.x = sinf(glfwGetTime()) * 5;
-	m_lightAlpha->m_transform.position.z = cosf(glfwGetTime()) * 5;
+	m_lightAlpha->m_transform.position.x = sinf((float)glfwGetTime()) * 5;
+	m_lightAlpha->m_transform.position.z = cosf((float)glfwGetTime()) * 5;
 
 	return 0;
 }
@@ -165,7 +165,6 @@ int ApplicationDemo::Draw()
 	m_groundMat->ApplyUniformMat4("modelMatrix", m_ground->m_transform.GetLocalMatrix());
 	// Render
 	m_ground->Render();
-	RenderableObject::Unbind();
 
 	// Update material
 	m_sign->Bind();
@@ -173,70 +172,23 @@ int ApplicationDemo::Draw()
 	m_signMat->ApplyUniformMat4("modelMatrix", m_sign->m_transform.GetLocalMatrix());
 	// Render
 	m_sign->Render();
-	RenderableObject::Unbind();
-
-	glm::vec3 lightPos = m_lightAlpha->m_transform.position; //  glm::vec3(-5, 5, 0);
-	glm::vec3 lightDir = m_lightAlpha->GetDirection(m_camera->position);
 
 	// Update material
+	glm::vec3 lightPos = m_lightAlpha->m_transform.position;
+	glm::vec3 lightDir = m_lightAlpha->GetDirection(m_camera->position);
 	m_spear->Bind();
 	m_spearMat->ApplyUniformMat4("projectionViewMatrix", projView);
 	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.GetLocalMatrix());
+	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.GetLocalMatrix());
+	// Lighting
 	m_spearMat->ApplyUniformVec3("cameraPos", m_camera->position);
 	m_spearMat->ApplyUniformVec3("lightDir", lightDir);
-	// m_spearMat->ApplyUniformFloat("roughness", 0.5f);
-
-
-	//m_spearMat->ApplyUniformVec3("L", glm::normalize(lPos - m_camera->m_position));
-	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.GetLocalMatrix());
+	//	m_spearMat->ApplyUniformFloat("roughness", 0.5f);
 	// Render
 	m_spear->Render();
+
+	// Finish
 	RenderableObject::Unbind();
-
-	//// Plane
-	//glUseProgram(m_primativeShader->GetProgramID());
-	//// Set Uniform
-	//int PVMatLoc1 = glGetUniformLocation(m_primativeShader->GetProgramID(), "projectionViewMatrix");
-	//glUniformMatrix4fv(PVMatLoc1, 1, false, glm::value_ptr(projView));
-
-	//m_groundRenderData->Render();
-
-	//// OBJ
-	//glUseProgram(m_basicObjShader->GetProgramID());
-	//// Set Uniform
-	//int PVMatLoc2 = glGetUniformLocation(m_basicObjShader->GetProgramID(), "projectionViewMatrix");
-	//glUniformMatrix4fv(PVMatLoc2, 1, false, glm::value_ptr(projView));
-	//int modelMatLoc2 = glGetUniformLocation(m_basicObjShader->GetProgramID(), "modelMatrix");
-	//glUniformMatrix4fv(modelMatLoc2, 1, false, glm::value_ptr(m_dragonTransform->WorldMatrix()));
-
-	//for (RenderData*& data : m_spearRenderData)
-	//	data->Render();
-
-	//// Ian
-	//glUseProgram(m_tintTexObjShader->GetProgramID());
-
-	//// set texture slot
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, m_signDiffuse->GetID());
-	//// tell the shader where it is 
-	//unsigned int texLoc1 = glGetUniformLocation(m_tintTexObjShader->GetProgramID(), "diffuse");
-	//if (texLoc1 < 0) { LOG_ERROR("glGetUniformLocation( diffuse ) failed.") }
-	//glUniform1i(texLoc1, 0);
-
-	//int PVMatLoc3 = glGetUniformLocation(m_tintTexObjShader->GetProgramID(), "projectionViewMatrix");
-	//glUniformMatrix4fv(PVMatLoc3, 1, false, glm::value_ptr(projView));
-	//int modelMatLoc3 = glGetUniformLocation(m_tintTexObjShader->GetProgramID(), "modelMatrix");
-	//glUniformMatrix4fv(modelMatLoc3, 1, false, glm::value_ptr(m_signTransform->WorldMatrix()));
-
-	//m_signRenderData->Render();
-
-	//// Spear
-	//glBindTexture(GL_TEXTURE_2D, m_texSpearDiffuse->GetID());
-	//// glUniform1i() 0 is for GL_TEXTURE0. 1 is for GL_TEXTURE1
-	//glUniform1i(texLoc1, 0);
-
-	//glUseProgram(0);
 
 	return 0;
 }
-
