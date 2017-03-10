@@ -186,7 +186,6 @@ int ApplicationDemo::Draw()
 	// m_spearMat->ApplyUniformFloat("roughness", 0.5f);
 
 
-
 	//m_spearMat->ApplyUniformVec3("L", glm::normalize(lPos - m_camera->m_position));
 	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.GetLocalMatrix());
 	// Render
