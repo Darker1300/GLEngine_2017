@@ -54,7 +54,7 @@ int ApplicationDemo::Start()
 	m_primativeShader = new Shader("./shaders/basic.vert", "./shaders/basic.frag");
 	m_basicObjShader = new Shader("./shaders/basicOBJ.vert", "./shaders/basicOBJ.frag");
 	m_tintTexObjShader = new Shader("./shaders/ian.vert", "./shaders/ian.frag");
-	m_texObjShader = new Shader("./shaders/texOBJ.vert", "./shaders/texOBJ.frag");
+	m_texObjShader = new Shader("./shaders/phongOBJ.vert", "./shaders/phongOBJ.frag");
 
 	// Textures
 	m_signDiffuse = new Texture("./textures/ian.png");
@@ -91,7 +91,8 @@ int ApplicationDemo::Start()
 	m_spear->m_transform.position += Vector3::up * 1;
 
 	//m_sign->m_transform.SetParent(&m_spear->m_transform);
-	//	m_sign->m_transform.Rotate({ 3.14159265f * 0.5f, 0, 0 });
+	m_sign->m_transform.AddPitch(3.14159265f * -0.5f);
+	m_sign->m_transform.AddYaw(3.14159265f * 1.0f);
 	m_sign->m_transform.position += Vector3::up * 10; //.Translate(m_sign->m_transform.Up() * 10);
 
 	return 0;

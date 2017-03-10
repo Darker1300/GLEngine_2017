@@ -1,7 +1,7 @@
 #include "Camera.h"
 
-#include <glm\gtx\transform.hpp>
 #include "Transform.h"
+#include <glm\gtx\transform.hpp>
 #include <glfw\glfw3.h>
 
 Camera* GLE::MAIN_CAM = nullptr;

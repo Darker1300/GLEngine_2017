@@ -174,7 +174,6 @@
     <ClCompile Include="Primatives.cpp" />
     <ClCompile Include="RenderableObject.cpp" />
     <ClCompile Include="RenderData.cpp" />
-    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="ShaderCollection.cpp" />
@@ -197,7 +196,6 @@
     <ClInclude Include="Primatives.h" />
     <ClInclude Include="RenderableObject.h" />
     <ClInclude Include="RenderData.h" />
-    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="ShaderCollection.h" />
