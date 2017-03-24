@@ -1,9 +1,15 @@
 #pragma once
 
 #include <string>
+
+class RenderTarget;
+
 class Texture
 {
 public:
+	friend class RenderTarget;
+
+	Texture();
 	Texture(const std::string& _path, const bool _flipY = true);
 	~Texture();
 
@@ -18,12 +24,12 @@ public:
 	int GetHeight() const { return m_height; }
 	int GetFormat() const { return m_format; }
 	const unsigned char* const GetData() const { return m_data; }
-	const std::string& GetPath() const { return m_path; }
+	//const std::string& GetPath() const { return m_path; }
 #pragma endregion Getters
 
-private:
-	void LoadTexture();
+	void LoadTexture(const std::string& _path, const bool _flipY = true);
 
+private:
 	unsigned int m_id;
 	int m_width,
 		m_height,
@@ -32,5 +38,5 @@ private:
 	unsigned char* m_data;
 	bool m_flipY;
 
-	std::string m_path;
+	//std::string m_path;
 };

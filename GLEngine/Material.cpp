@@ -14,6 +14,19 @@ Material::Material(Shader * _shader)
 {
 }
 
+Material::Material(const Material & _other)
+	: m_shader(_other.m_shader)
+	, m_textures(_other.m_textures)
+{
+}
+
+Material & Material::operator=(const Material & _other)
+{
+	m_shader = _other.m_shader;
+	m_textures = _other.m_textures;
+	return *this;
+}
+
 Material::~Material()
 {
 }
@@ -32,8 +45,17 @@ void Material::Bind() const
 	}
 }
 
-void Material::Unbind()
+void Material::Unbind() const
 {
+	// Unbind Textures
+	auto iter = m_textures.begin();
+	for (unsigned int count = 0;
+		iter != m_textures.end(); iter++, count++)
+	{
+		glActiveTexture(GL_TEXTURE0 + count);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 	glUseProgram(0);
 }
 

@@ -1,17 +1,17 @@
 #version 410
 
-in vec4 vColour;
 in vec2 vUV;
 
-uniform sampler2D diffuse;
+uniform vec3 ambientMat = vec3(1,1,1);
+uniform sampler2D diffuseMap;
 
-out vec4 gl_FragColor;
+out vec4 fragColour;
 
 void main()
 {
-	vec4 tex = texture(diffuse, vUV);
+	vec4 tex = texture(diffuseMap, vUV);
 	// Simple transparency
-	if(tex.a < 0.1) discard;
+	if(tex.a != 1.00) discard;
 
-	gl_FragColor = tex * vColour;
+	fragColour = tex * vec4(ambientMat, 1.0f);
 }

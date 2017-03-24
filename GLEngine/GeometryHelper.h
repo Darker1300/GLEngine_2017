@@ -9,12 +9,6 @@ class RenderData;
 
 namespace GeometryHelper
 {
-	struct SimpleVertex {
-		glm::vec4 position;
-		glm::vec4 colour;
-		glm::vec2 uv;
-	};
-
 	struct OBJVertex {
 		// x, y, z, w
 		glm::vec4 position;
@@ -28,12 +22,11 @@ namespace GeometryHelper
 		glm::vec4 bitangent;
 	};
 
-	RenderData* CreatePlane(const unsigned int _rows, const unsigned int _cols, const float _width, const float _height, const glm::vec4& _colour);
-	RenderData* CreateQuad(const float _width, const float _height, glm::vec3 facingDirection, const glm::vec4& _colour);
+	RenderData* CreatePlane(const unsigned int _rows, const unsigned int _cols, const float _width, const float _height);
+	RenderData* CreateQuad();
 
 	std::vector<RenderData*> LoadOBJFromDisk(const std::string& _path);
 	void CalculateTangents(std::vector<OBJVertex>& vertices);
-
-
+	void CalculateTangents(std::vector<OBJVertex>& vertices, std::vector<unsigned int>& indices);
 };
 

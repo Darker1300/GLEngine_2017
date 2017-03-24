@@ -9,11 +9,13 @@
 #include "tiny_obj_loader.h"
 
 namespace GeometryHelper {
-	RenderData * CreatePlane(const unsigned int _rows, const unsigned int _cols, const float _width, const float _height, const glm::vec4& _colour)
+	RenderData * CreatePlane(const unsigned int _rows, const unsigned int _cols, const float _width, const float _height)
 	{
 		// Vertices
 		unsigned int verticesSize = _rows * _cols;
-		SimpleVertex* vertices = new SimpleVertex[verticesSize];
+		std::vector<OBJVertex> vertices = std::vector<OBJVertex>();// new OBJVertex[verticesSize];
+		vertices.reserve(verticesSize);
+
 		float colSpacing = _width / (_cols - 1);
 		float rowSpacing = _height / (_rows - 1);
 
@@ -25,13 +27,12 @@ namespace GeometryHelper {
 		{
 			for (unsigned int c = 0; c < _cols; c++)
 			{
-				SimpleVertex& vert = vertices[r * _cols + c];
+				vertices.push_back(OBJVertex());
+				OBJVertex& vert = vertices[r * _cols + c];
 				// Pos
 				vert.position = glm::vec4(
 					-(_width / 2) + (colSpacing * c), 0,
 					-(_height / 2) + (rowSpacing * r), 1);
-				// Colour
-				vert.colour = _colour;
 				// UVs
 				vert.uv = glm::vec2(
 					c * uvFactorX,
@@ -40,7 +41,8 @@ namespace GeometryHelper {
 		}
 		// Indices
 		unsigned int indicesSize = (_rows - 1) * (_cols - 1) * 6;
-		unsigned int* indices = new unsigned int[indicesSize];
+		std::vector<unsigned int> indices = std::vector<unsigned int>();
+		indices.reserve(indicesSize);
 
 		// Indices Generation
 		unsigned int index = 0;
@@ -49,39 +51,41 @@ namespace GeometryHelper {
 			for (unsigned int c = 0; c < (_cols - 1); ++c)
 			{
 				// Triangle 1
-				indices[index++] = r * _cols + c;
-				indices[index++] = (r + 1) * _cols + c;
-				indices[index++] = (r + 1) * _cols + (c + 1);
+				indices.push_back(r * _cols + c);
+				indices.push_back((r + 1) * _cols + c);
+				indices.push_back((r + 1) * _cols + (c + 1));
 				// Triangle 2
-				indices[index++] = r * _cols + c;
-				indices[index++] = (r + 1) * _cols + (c + 1);
-				indices[index++] = r * _cols + (c + 1);
+				indices.push_back(r * _cols + c);
+				indices.push_back((r + 1) * _cols + (c + 1));
+				indices.push_back(r * _cols + (c + 1));
 			}
 		}
+		// Calculate Tangents
+		CalculateTangents(vertices, indices);
 
 		// Store on GPU
 		RenderData* renderData = new RenderData();
-		renderData->GenerateBuffers();
+		renderData->GenerateBuffers(true);
 
 		// Bind VAO (includes VBO & IBO)
 		renderData->Bind();
 		// Send Vertices
-		glBufferData(GL_ARRAY_BUFFER, verticesSize * sizeof(SimpleVertex), vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, verticesSize * sizeof(OBJVertex), &vertices[0], GL_STATIC_DRAW);
 		// Send Indices
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
 		// Let OpenGL know where to find the data in the vertex
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, false, sizeof(SimpleVertex),
-			(char*)offsetof(SimpleVertex, position));
-
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 4, GL_FLOAT, false, sizeof(SimpleVertex),
-			(char*)offsetof(SimpleVertex, colour));
-
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, false, sizeof(SimpleVertex),
-			(char*)offsetof(SimpleVertex, uv));
+		glEnableVertexAttribArray(3);
+		glEnableVertexAttribArray(4);
+
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(OBJVertex), (void*)offsetof(OBJVertex, OBJVertex::position));
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(OBJVertex), (void*)offsetof(OBJVertex, OBJVertex::uv));
+		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(OBJVertex), (void*)offsetof(OBJVertex, OBJVertex::normal));
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(OBJVertex), (void*)offsetof(OBJVertex, OBJVertex::tangent));
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(OBJVertex), (void*)offsetof(OBJVertex, OBJVertex::bitangent));
 
 		// Unbind VAO (includes VBO & IBO)
 		renderData->Unbind();
@@ -91,15 +95,15 @@ namespace GeometryHelper {
 		renderData->SetPrimitiveType(GL_TRIANGLES);
 
 		// Delete cpu-side data
-		delete[] vertices;
-		delete[] indices;
+		vertices.clear();
+		indices.clear();
 
 		return renderData;
 	}
 
-	RenderData * CreateQuad(const float _width, const float _height, glm::vec3 facingDirection, const glm::vec4& _colour)
+	RenderData * CreateQuad()
 	{
-		return nullptr;
+		return GeometryHelper::CreatePlane(2, 2, 1, 1);
 	}
 
 	std::vector<RenderData*> LoadOBJFromDisk(const std::string& _path)
@@ -244,6 +248,71 @@ namespace GeometryHelper {
 			// calculate bitangent (ignoring for Vertex)
 			vertices[a].bitangent = glm::vec4(glm::cross(glm::vec3(vertices[a].normal), glm::vec3(vertices[a].tangent)) * vertices[a].tangent.w, 0);
 			vertices[a].tangent.w = 0;
+		}
+
+		delete[] tan1;
+	}
+
+	void CalculateTangents(std::vector<OBJVertex>& vertices, std::vector<unsigned int>& indices)
+	{
+		unsigned int vertexCount = (unsigned int)indices.size();
+		glm::vec4* tan1 = new glm::vec4[vertexCount * 2];
+		glm::vec4* tan2 = tan1 + vertexCount;
+		memset(tan1, 0, vertexCount * sizeof(glm::vec4) * 2);
+
+		for (unsigned int a = 0; a < (unsigned int)indices.size(); a += 3) {
+			long i1 = indices[a];
+			long i2 = indices[a + 1];
+			long i3 = indices[a + 2];
+
+			const glm::vec4& v1 = vertices[i1].position;
+			const glm::vec4& v2 = vertices[i2].position;
+			const glm::vec4& v3 = vertices[i3].position;
+
+			const glm::vec2& w1 = vertices[i1].uv;
+			const glm::vec2& w2 = vertices[i2].uv;
+			const glm::vec2& w3 = vertices[i3].uv;
+
+			float x1 = v2.x - v1.x;
+			float x2 = v3.x - v1.x;
+			float y1 = v2.y - v1.y;
+			float y2 = v3.y - v1.y;
+			float z1 = v2.z - v1.z;
+			float z2 = v3.z - v1.z;
+
+			float s1 = w2.x - w1.x;
+			float s2 = w3.x - w1.x;
+			float t1 = w2.y - w1.y;
+			float t2 = w3.y - w1.y;
+
+			float r = 1.0F / (s1 * t2 - s2 * t1);
+			glm::vec4 sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
+				(t2 * z1 - t1 * z2) * r, 0);
+			glm::vec4 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
+				(s1 * z2 - s2 * z1) * r, 0);
+
+			tan1[i1] += sdir;
+			tan1[i2] += sdir;
+			tan1[i3] += sdir;
+
+			tan2[i1] += tdir;
+			tan2[i2] += tdir;
+			tan2[i3] += tdir;
+		}
+
+		for (unsigned int a = 0; a < vertexCount; a++) {
+			const glm::vec3& n = glm::vec3(vertices[indices[a]].normal);
+			const glm::vec3& t = glm::vec3(tan1[indices[a]]);
+
+			// Gram-Schmidt orthogonalize
+			vertices[indices[a]].tangent = glm::vec4(glm::normalize(t - n * glm::dot(n, t)), 0);
+
+			// Calculate handedness (direction of bitangent)
+			vertices[indices[a]].tangent.w = (glm::dot(glm::cross(glm::vec3(n), glm::vec3(t)), glm::vec3(tan2[indices[a]])) < 0.0F) ? 1.0F : -1.0F;
+
+			// calculate bitangent (ignoring for Vertex)
+			vertices[indices[a]].bitangent = glm::vec4(glm::cross(glm::vec3(vertices[indices[a]].normal), glm::vec3(vertices[indices[a]].tangent)) * vertices[indices[a]].tangent.w, 0);
+			vertices[indices[a]].tangent.w = 0;
 		}
 
 		delete[] tan1;

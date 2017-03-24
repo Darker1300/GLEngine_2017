@@ -6,16 +6,28 @@
 #include <gl_core_4_4.h>
 #include <stb_image.h>
 
+Texture::Texture()
+	:
+	//m_path(""),
+	m_id(-1)
+	, m_width(0)
+	, m_height(0)
+	, m_format(-1)
+	, m_data(nullptr)
+	, m_flipY(false)
+{
+}
+
 Texture::Texture(const std::string & _path, const bool _flipY /*= true*/)
-	: m_path(_path)
-	, m_id(-1)
+	:// m_path(_path) ,
+	m_id(-1)
 	, m_width(0)
 	, m_height(0)
 	, m_format(-1)
 	, m_data(nullptr)
 	, m_flipY(_flipY)
 {
-	LoadTexture();
+	LoadTexture(_path, m_flipY);
 }
 
 Texture::~Texture()
@@ -30,19 +42,22 @@ Texture::Texture(Texture && _other)
 	m_height = _other.m_height;
 	m_format = _other.m_format;
 	m_data = _other.m_data;
-	m_path = _other.m_path;
+	//m_path = _other.m_path;
 	_other.m_id = -1;
 	_other.m_data = nullptr;
 }
 
-void Texture::LoadTexture()
+void Texture::LoadTexture(const std::string& _path, const bool _flipY)
 {
+	m_flipY = _flipY;
+	//m_path = _path;
+
 	// Set Y flip option
 	stbi_set_flip_vertically_on_load(m_flipY);
 	// Load
-	m_data = stbi_load(m_path.c_str(), &m_width, &m_height, &m_format, STBI_default);
+	m_data = stbi_load(_path.c_str(), &m_width, &m_height, &m_format, STBI_default);
 	if (m_data == nullptr) {
-		LOG_ERROR("STBI failed to load image at:\n ", m_path, ".");
+		LOG_ERROR("STBI failed to load image at:\n ", _path, ".");
 		return;
 	}
 

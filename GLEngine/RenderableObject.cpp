@@ -28,8 +28,8 @@ void RenderableObject::Render()
 	}
 }
 
-void RenderableObject::Unbind()
+void RenderableObject::Unbind() const
 {
-	Material::Unbind();
+	m_material->Unbind();
 	RenderData::Unbind();
 }

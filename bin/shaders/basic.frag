@@ -1,10 +1,10 @@
 #version 410
 
-in vec4 vColour;
+uniform vec3 ambientMat = vec3(0,0,0);
 
 out vec4 fragColour;
 
 void main()
 {
-	fragColour = vColour;
+	fragColour = vec4(ambientMat, 1.0f);
 }

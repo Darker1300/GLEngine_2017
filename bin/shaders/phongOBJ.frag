@@ -22,7 +22,7 @@ uniform vec3 cameraPos;	// world-space camera position
 uniform vec3 lightDir;	// normalised light direction from light
 uniform float roughness;	// surface roughness. UNUSED WITH PHONG
 
-out vec4 gl_FragColor;
+out vec4 fragColour;
 
 void main()
 {
@@ -46,6 +46,6 @@ void main()
 	float specTerm = pow( clamp( dot( R, E ), 0.f, 1.f ), specularLightPower );	// Specular Term
 	vec3 Specular = texture( specularMap, vUV ).xyz * specularLight * specTerm; // specular light for 1 light
 
-	gl_FragColor = vec4( Ambient + Diffuse + Specular, 1.0f); // Ambient + Diffuse + Specular
+	fragColour = vec4( Ambient + Diffuse + Specular, 1.0f); // Ambient + Diffuse + Specular
 	// -------------------------------------------
 }

@@ -22,7 +22,7 @@ public:
 	int GetFPS();
 	///<summary>Fixed Updates Per a Second.</summary>
 	int GetFUPS();
-	void SetBackgroundColor(float _r, float _g, float _b, float _a = 1.0f);
+	void SetBackgroundColor(float _r, float _g, float _b, float _a = 0.0f);
 
 protected:
 	// Run Calls

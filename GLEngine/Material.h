@@ -11,16 +11,15 @@ class Material
 {
 public:
 	Material(Shader* _shader = nullptr);
-
-	// TODO COPY/MOVE
-
+	Material(const Material& _other);
+	Material& operator=(const Material& _other);
 	~Material();
 
 	Shader* m_shader;
 	std::map<std::string, Texture*> m_textures;
 
 	void Bind() const;
-	static void Unbind();
+	void Unbind() const;
 
 	void ApplyUniformMat4(const std::string& _name, const glm::mat4& _matrix) const;
 	void ApplyUniformFloat(const std::string& _name, const float& _value) const;
