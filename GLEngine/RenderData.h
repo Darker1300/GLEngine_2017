@@ -13,8 +13,10 @@ public:
 	void GenerateBuffers(bool _generateIndexBuffer = true);
 
 	template <typename T>
-	void FillVertexBuffer(T* _first, unsigned _count) const;
-	void FillIndexBuffer(unsigned int* _first, unsigned _count) const;
+	void FillVertexBuffer(T* _first, unsigned _count);
+	void FillIndexBuffer(unsigned int* _first, unsigned _count);
+
+	void SetFloatAttributePointer(unsigned _slot, unsigned _floatCount, unsigned _vertexSize, unsigned _vertexMemberOffset);
 
 	void Render() const;
 	void Bind() const;
@@ -48,8 +50,9 @@ private:
 };
 
 template<typename T>
-inline void RenderData::FillVertexBuffer(T * _first, unsigned _count) const
+inline void RenderData::FillVertexBuffer(T * _first, unsigned _count)
 {
+	SetIndicesSize(_count);
 	// Bind
 	Bind();
 	// Send Vertices

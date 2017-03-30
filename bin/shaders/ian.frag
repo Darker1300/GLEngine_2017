@@ -10,8 +10,9 @@ out vec4 fragColour;
 void main()
 {
 	vec4 tex = texture(diffuseMap, vUV);
-	// Simple transparency
-	if(tex.a != 1.00) discard;
 
-	fragColour = tex * vec4(ambientMat, 1.0f);
+	// Simple transparency
+	if(tex.a <= 0) discard;
+
+	fragColour = vec4(tex.xyz, 1) * vec4(ambientMat, 1.0f);
 }

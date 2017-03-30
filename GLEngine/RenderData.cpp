@@ -55,13 +55,21 @@ void RenderData::GenerateBuffers(bool _generateIndexBuffer)
 	glBindVertexArray(0);
 }
 
-inline void RenderData::FillIndexBuffer(unsigned int * _first, unsigned _count) const
+inline void RenderData::FillIndexBuffer(unsigned int * _first, unsigned _count)
 {
 	if (!m_hasIndexBuffer) { LOG_ERROR("Tried to fill non-existant index buffer."); return; }
+	SetIndicesSize(_count);
 	// Bind
 	Bind();
 	// Send Indices
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, _count * sizeof(unsigned int), _first, GL_STATIC_DRAW);
+}
+
+void RenderData::SetFloatAttributePointer(unsigned _slot, unsigned _floatCount, unsigned _vertexSize, unsigned _vertexMemberOffset)
+{
+	Bind();
+	glEnableVertexAttribArray(_slot);
+	glVertexAttribPointer(_slot, _floatCount, GL_FLOAT, GL_FALSE, _vertexSize, (void*)_vertexMemberOffset);
 }
 
 void RenderData::Render() const
@@ -76,9 +84,7 @@ void RenderData::Render() const
 
 void RenderData::Bind() const
 {
-	if (m_VAO == -1) {
-		LOG_ERROR("You are binding an invalid buffer.")
-	}
+	if (m_VAO == -1) LOG_ERROR("You are binding an invalid buffer.");
 	glBindVertexArray(m_VAO);
 }
 

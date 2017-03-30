@@ -31,8 +31,9 @@ namespace GeometryHelper {
 				OBJVertex& vert = vertices[r * _cols + c];
 				// Pos
 				vert.position = glm::vec4(
-					-(_width / 2) + (colSpacing * c), 0,
-					-(_height / 2) + (rowSpacing * r), 1);
+					-(_width / 2) + (colSpacing * c),
+					-(_height / 2) + (rowSpacing * r),
+					0, 1);
 				// UVs
 				vert.uv = glm::vec2(
 					c * uvFactorX,
@@ -106,6 +107,43 @@ namespace GeometryHelper {
 		return GeometryHelper::CreatePlane(2, 2, 1, 1);
 	}
 
+	RenderData * CreateFullscreenQuad(const float _windowWidth, const float _windowHeight)
+	{
+		RenderData* renderData = new RenderData();
+		renderData->GenerateBuffers(false);
+
+		std::vector<OBJVertex> vertexData;
+		vertexData.reserve(6);
+		for (int i = 0; i < 6; i++) vertexData.push_back(OBJVertex());
+
+		vertexData[0].position	= glm::vec4(-1,	-1,	0,	1);
+		vertexData[1].position	= glm::vec4( 1,	 1,	0,	1);
+		vertexData[2].position	= glm::vec4(-1,	 1,	0,	1);
+		vertexData[3].position	= glm::vec4(-1,	-1,	0,	1);
+		vertexData[4].position	= glm::vec4( 1,	-1,	0,	1);
+		vertexData[5].position	= glm::vec4( 1,	 1,	0,	1);
+
+		glm::vec2 halfTexel = 1.0f / glm::vec2(_windowWidth, _windowHeight) * 0.5f;
+		vertexData[0].uv = glm::vec2(halfTexel.x, halfTexel.y);
+		vertexData[1].uv = glm::vec2(1 - halfTexel.x, 1 - halfTexel.y);
+		vertexData[2].uv = glm::vec2(halfTexel.x, 1 - halfTexel.y);
+		vertexData[3].uv = glm::vec2(halfTexel.x, halfTexel.y);
+		vertexData[4].uv = glm::vec2(1 - halfTexel.x, halfTexel.y);
+		vertexData[5].uv = glm::vec2(1 - halfTexel.x, 1 - halfTexel.y);
+
+		CalculateTangents(vertexData);
+
+		renderData->FillVertexBuffer(&vertexData[0], 6);
+		renderData->SetFloatAttributePointer(0, 4, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::position));
+		renderData->SetFloatAttributePointer(1, 2, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::uv));
+		renderData->SetFloatAttributePointer(2, 4, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::normal));
+		renderData->SetFloatAttributePointer(3, 4, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::tangent));
+		renderData->SetFloatAttributePointer(4, 4, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::bitangent));
+		renderData->Unbind();
+
+		return renderData;
+	}
+
 	std::vector<RenderData*> LoadOBJFromDisk(const std::string& _path)
 	{
 		tinyobj::attrib_t attribs;
@@ -163,9 +201,10 @@ namespace GeometryHelper {
 			RenderData* renderData = new RenderData();
 			modelRenderData.push_back(renderData);
 			// Set indices size (in this case == vertices size)
-			renderData->SetIndicesSize(vertices.size());
 			renderData->GenerateBuffers(false);
 			renderData->Bind();
+
+			renderData->SetIndicesSize(vertices.size());
 
 			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(OBJVertex), vertices.data(), GL_STATIC_DRAW);
 

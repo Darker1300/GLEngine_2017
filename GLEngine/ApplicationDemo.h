@@ -34,6 +34,7 @@ protected:
 	Shader* m_basicShader;
 	Shader* m_tintTexShader;
 	Shader* m_phongShader;
+	Shader* m_depthTargetShader;
 
 	Texture* m_texWhite;
 
@@ -49,6 +50,7 @@ protected:
 	RenderData* m_signRenderData;
 	std::vector<RenderData*> m_spearRenderData;
 	RenderData* m_mirrorRenderData;
+	RenderData* m_screenRenderData;
 
 	Material* m_groundMat;
 	Material* m_signMat;

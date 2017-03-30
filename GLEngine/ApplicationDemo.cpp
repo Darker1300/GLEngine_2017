@@ -56,6 +56,7 @@ int ApplicationDemo::Start()
 	m_basicShader = new Shader("./shaders/basicOBJ.vert", "./shaders/basicOBJ.frag");
 	m_tintTexShader = new Shader("./shaders/ian.vert", "./shaders/ian.frag");
 	m_phongShader = new Shader("./shaders/phongOBJ.vert", "./shaders/phongOBJ.frag");
+	m_depthTargetShader = new Shader("./shaders/depthTarget.vert", "./shaders/depthTarget.frag");
 
 	// Textures
 	m_texWhite = new Texture("./textures/white.png");
@@ -65,18 +66,22 @@ int ApplicationDemo::Start()
 	m_texSpearNormal = new Texture("./models/soulspear/soulspear_normal.tga");
 
 	m_renderTarget1 = new RenderTarget();
-	m_renderTarget1->Generate(512, 512);
+	m_renderTarget1->Generate(GLE::APP->GetWindowWidth(), GLE::APP->GetWindowHeight());
 
 	// RenderData
 	m_groundRenderData = GeometryHelper::CreatePlane(10, 10, 10, 10);
 	m_signRenderData = GeometryHelper::CreatePlane(2, 2, 4, 2);
 	m_spearRenderData = GeometryHelper::LoadOBJFromDisk("./models/soulspear/soulspear.obj"); //stanford/dragon
 	m_mirrorRenderData = GeometryHelper::CreatePlane(2, 2, 4, 4);
+
+	// fullscreen quad
+	m_screenRenderData = GeometryHelper::CreateFullscreenQuad((float)GLE::APP->GetWindowWidth(), (float)GLE::APP->GetWindowHeight());
+
 	// Materials
 	m_groundMat = new Material(m_phongShader);
 	m_spearMat = new Material(m_phongShader);
 	m_signMat = new Material(m_tintTexShader);
-	m_mirrorMat = new Material(m_tintTexShader);
+	m_mirrorMat = new Material(m_depthTargetShader);
 
 	// Set Textures
 	m_groundMat->m_textures["normalMap"] = m_texWhite;
@@ -89,13 +94,14 @@ int ApplicationDemo::Start()
 	m_spearMat->m_textures["diffuseMap"] = m_texSpearDiffuse;
 	m_spearMat->m_textures["specularMap"] = m_texSpearSpecular;
 
-	m_mirrorMat->m_textures["diffuseMap"] = m_renderTarget1->m_texture;
+	m_mirrorMat->m_textures["depthMap"] = m_renderTarget1->m_depth;
+	m_mirrorMat->m_textures["colourMap"] = m_renderTarget1->m_colour;
 
 	// RenderableObjects
 	m_ground = new RenderableObject(m_groundMat, std::vector<RenderData*>{ m_groundRenderData });
 	m_sign = new RenderableObject(m_signMat, std::vector<RenderData*>{ m_signRenderData });
 	m_spear = new RenderableObject(m_spearMat, m_spearRenderData);
-	m_mirror = new RenderableObject(m_mirrorMat, std::vector<RenderData*>{m_mirrorRenderData});
+	m_mirror = new RenderableObject(m_mirrorMat, std::vector<RenderData*>{m_screenRenderData});
 
 	m_lightAlpha = new Light();
 
@@ -104,14 +110,15 @@ int ApplicationDemo::Start()
 	m_spear->m_transform.position += Vector3::up * 1;
 
 	//m_sign->m_transform.SetParent(&m_spear->m_transform);
-	m_sign->m_transform.AddPitch(3.14159265f * -0.5f);
-	m_sign->m_transform.AddYaw(3.14159265f * 1.0f);
+	m_ground->m_transform.AddPitch(3.14159265f * 0.5f);
+	//m_sign->m_transform.AddPitch(3.14159265f * -0.5f);
+	//m_sign->m_transform.AddYaw(3.14159265f * 1.0f);
 	m_sign->m_transform.position += Vector3::up * 10; //.Translate(m_sign->m_transform.Up() * 10);
 
 	m_mirror->m_transform.position += Vector3::up * 2;
 	m_mirror->m_transform.position += Vector3::right * 2;
-	m_mirror->m_transform.AddPitch(3.14159265f * -0.5f);
-	m_mirror->m_transform.AddYaw(3.14159265f * 1);
+	//m_mirror->m_transform.AddPitch(3.14159265f * -0.5f);
+	//m_mirror->m_transform.AddYaw(3.14159265f * 1);
 
 	return 0;
 }
@@ -132,6 +139,7 @@ int ApplicationDemo::Shutdown()
 	delete m_spearMat;
 	delete m_groundMat;
 
+	delete m_screenRenderData;
 	delete m_mirrorRenderData;
 	for (auto data : m_spearRenderData) delete data;
 	delete m_signRenderData;
@@ -147,6 +155,7 @@ int ApplicationDemo::Shutdown()
 
 	delete m_texWhite;
 
+	delete m_depthTargetShader;
 	delete m_phongShader;
 	delete m_tintTexShader;
 	delete m_basicShader;
@@ -189,9 +198,12 @@ int ApplicationDemo::Draw()
 	glm::vec3 lightPos = m_lightAlpha->m_transform.position;
 	glm::vec3 lightDir = m_lightAlpha->GetDirection(m_camera->position);
 
+	// Bind RenderTarget
+	m_renderTarget1->Bind();
+
 	// Update material
 	m_ground->Bind();
-	m_groundMat->ApplyUniformVec3("ambientMat", { 0, 0, 0 }); // { 0.0f, 0.4f, 0.0f });
+	//m_groundMat->ApplyUniformVec3("ambientMat", { 0, 0, 0 }); // { 0.0f, 0.4f, 0.0f });
 	m_groundMat->ApplyUniformMat4("projectionViewMatrix", projView);
 	m_groundMat->ApplyUniformMat4("modelMatrix", m_ground->m_transform.GetLocalMatrix());
 	// Lighting
@@ -204,25 +216,24 @@ int ApplicationDemo::Draw()
 
 	// Update material
 	m_sign->Bind();
-	m_signMat->ApplyUniformVec3("ambientMat", { 0, 0, 0 }); // { 0, 0.5f, 1 });
+	//m_signMat->ApplyUniformVec3("ambientMat", { 0, 0, 0 }); // { 0, 0.5f, 1 });
 	m_signMat->ApplyUniformMat4("projectionViewMatrix", projView);
 	m_signMat->ApplyUniformMat4("modelMatrix", m_sign->m_transform.GetLocalMatrix());
 	// Render
 	m_sign->Render();
 
-	// Light
+	// Render second for Light
 	m_signMat->ApplyUniformMat4("modelMatrix", m_lightAlpha->m_transform.GetLocalMatrix());
 	// Render
 	m_sign->Render();
+
 	// Unbind
 	m_sign->Unbind();
 
-	// Bind RenderTarget
-	m_renderTarget1->Bind();
 
 	// Update material
 	m_spear->Bind();
-	m_spearMat->ApplyUniformVec3("ambientMat", { 0, 0, 0 });
+	//m_spearMat->ApplyUniformVec3("ambientMat", { 0, 0, 0 });
 	m_spearMat->ApplyUniformMat4("projectionViewMatrix", projView);
 	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.GetLocalMatrix());
 	// Lighting
@@ -237,28 +248,16 @@ int ApplicationDemo::Draw()
 	m_renderTarget1->Unbind();
 
 	// Update material
-	m_spear->Bind();
-	m_spearMat->ApplyUniformVec3("ambientMat", { 0, 0, 0 });
-	m_spearMat->ApplyUniformMat4("projectionViewMatrix", projView);
-	m_spearMat->ApplyUniformMat4("modelMatrix", m_spear->m_transform.GetLocalMatrix());
-	// Lighting
-	m_spearMat->ApplyUniformVec3("cameraPos", m_camera->position);
-	m_spearMat->ApplyUniformVec3("lightDir", lightDir);
-	// Render
-	m_spear->Render();
-	// Unbind
-	m_spear->Unbind();
-
-	// Update material
 	m_mirror->Bind();
-	m_mirrorMat->ApplyUniformVec3("ambientMat", { 1, 1, 1 });
-	m_mirrorMat->ApplyUniformMat4("projectionViewMatrix", projView);
-	m_mirrorMat->ApplyUniformMat4("modelMatrix", m_mirror->m_transform.GetLocalMatrix());
+	//m_mirrorMat->ApplyUniformVec3("ambientMat", { 1, 1, 1 });
+	//m_mirrorMat->ApplyUniformMat4("projectionViewMatrix", projView);
+	//m_mirrorMat->ApplyUniformMat4("modelMatrix", m_mirror->m_transform.GetLocalMatrix());
+	float move = (float)glfwGetTime();// / 1000.0 * 2 * 3.14159 * .75;
+	m_mirrorMat->ApplyUniformFloat("distortTime", move);
 	// Render
 	m_mirror->Render();
 	// Unbind
 	m_mirror->Unbind();
-
 
 	return 0;
 }

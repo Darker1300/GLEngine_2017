@@ -18,6 +18,10 @@ public:
 	void Unbind();
 
 	unsigned int m_frameBufferID;
-	Texture* m_texture;
+	Texture* m_colour;
 	Texture* m_depth;
+
+private:
+	unsigned int CreateTexture2D(const int w, const int h, int, unsigned int format, unsigned int type);
+	bool CreateFBO(const int w, const int h);
 };
