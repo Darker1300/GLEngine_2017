@@ -22,6 +22,5 @@ public:
 	Texture* m_depth;
 
 private:
-	unsigned int CreateTexture2D(const int w, const int h, int, unsigned int format, unsigned int type);
-	bool CreateFBO(const int w, const int h);
+	bool CreateFBO(const int _width, const int _height);
 };

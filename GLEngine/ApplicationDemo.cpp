@@ -21,6 +21,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "RenderTarget.h"
+#include "ParticleSystem.h"
 
 ApplicationDemo::ApplicationDemo()
 	: ApplicationBase("Game Engine Demo", 1280, 720) {}
@@ -41,8 +42,8 @@ int ApplicationDemo::Start()
 
 	// Set up Camera
 	m_camera = new Camera();
-	m_camera->position += Vector3::backward * 8;
-	m_camera->position += Vector3::up * 4;
+	m_camera->position += Vector3::backward * 18;
+	m_camera->position += Vector3::up * 5;
 	m_camera->yaw += glm::radians(180.f);
 	//m_camera->SetAsMain();
 
@@ -74,7 +75,7 @@ int ApplicationDemo::Start()
 	m_signRenderData = GeometryHelper::CreatePlane(2, 2, 4, 2);
 	m_spearRenderData = GeometryHelper::LoadOBJFromDisk("./models/soulspear/soulspear.obj"); //stanford/dragon
 	m_mirrorRenderData = GeometryHelper::CreatePlane(2, 2, 4, 4);
-	m_sphereRenderData = GeometryHelper::CreateSphere(2, 16, 16);
+	m_sphereRenderData = GeometryHelper::CreateSphere(0.5f, 16, 16);
 
 	// fullscreen quad
 	m_screenRenderData = GeometryHelper::CreateFullscreenQuad((float)GLE::APP->GetWindowWidth(), (float)GLE::APP->GetWindowHeight());
@@ -110,22 +111,34 @@ int ApplicationDemo::Start()
 	m_mirror = new RenderableObject(m_mirrorMat, std::vector<RenderData*>{m_screenRenderData});
 	m_light = new RenderableObject(m_lightObjMat, std::vector<RenderData*>{m_sphereRenderData});
 
+	// Misc
 	m_lightAlpha = new Light();
 
+	m_emitter = new ParticleSystem();
+	m_emitter->Initalise(
+		100000,
+		0.1f, 5.0f,
+		5, 20,
+		1, 0.1f,
+		glm::vec4(1, 0, 1, 1), glm::vec4(0, 0, 1, 0));
+
 	// Set Transforms
-	//m_spear->m_transform.scale = {1};//0.01f};
 	m_spear->m_transform.position += Vector3::up * 1;
 
-	//m_sign->m_transform.SetParent(&m_spear->m_transform);
 	m_ground->m_transform.AddPitch(3.14159265f * 0.5f);
-	//m_sign->m_transform.AddPitch(3.14159265f * -0.5f);
+
 	m_sign->m_transform.AddYaw(3.14159265f * 1.0f);
-	m_sign->m_transform.position += Vector3::up * 10; //.Translate(m_sign->m_transform.Up() * 10);
+	m_sign->m_transform.position += Vector3::up * 10;
 
 	m_mirror->m_transform.position += Vector3::up * 2;
 	m_mirror->m_transform.position += Vector3::right * 2;
-	//m_mirror->m_transform.AddPitch(3.14159265f * -0.5f);
-	//m_mirror->m_transform.AddYaw(3.14159265f * 1);
+
+	float currentTime = (float)glfwGetTime();
+	m_lightAlpha->m_transform.position.x = sinf(currentTime) * 5;
+	m_lightAlpha->m_transform.position.z = cosf(currentTime) * 5;
+	m_lightAlpha->m_transform.position.y = 3;
+
+	m_emitter->m_position.z = 6;
 
 	return 0;
 }
@@ -183,22 +196,27 @@ int ApplicationDemo::Shutdown()
 int ApplicationDemo::FixedUpdate(double _deltaTime)
 {
 	if (ApplicationBase::FixedUpdate(_deltaTime)) return -1;
-	//m_signTransform->Rotate({ 0,1 * _deltaTime,0 });
+
+	// Camera controls
+	m_camera->UpdateFly(GetWindow(), (float)_deltaTime, 3, 1);
+
+	// Transformations
+	m_spear->m_transform.AddYaw(3.14159265f * (float)_deltaTime * -0.001f);
+
+	m_lightAlpha->m_transform.position.x = sinf((float)glfwGetTime()) * 5;
+	m_lightAlpha->m_transform.position.z = cosf((float)glfwGetTime()) * 5;
+	m_lightAlpha->m_transform.AddYaw(3.14159265f * (float)_deltaTime * 0.8f);
+	m_lightAlpha->m_transform.AddRoll(3.14159265f * (float)_deltaTime * 0.25f);
+
+	m_emitter->m_position.x = sinf((float)glfwGetTime()) * -10;
+	m_emitter->m_position.y = cosf((float)glfwGetTime()) * -10;
+
 	return 0;
 }
 
 int ApplicationDemo::Update(double _deltaTime)
 {
 	if (ApplicationBase::Update(_deltaTime)) return -1;
-
-	// Camera controls
-	m_camera->UpdateFly(GetWindow(), (float)_deltaTime, 3, 1);
-
-	// Transformations
-	//m_spear->m_transform.AddYaw((float)_deltaTime * 0.5f);
-	m_lightAlpha->m_transform.position.x = sinf((float)glfwGetTime()) * 5;
-	m_lightAlpha->m_transform.position.y = 3;// sinf((float)glfwGetTime()) * 10;
-	m_lightAlpha->m_transform.position.z = cosf((float)glfwGetTime()) * 5;
 
 	return 0;
 }
@@ -233,8 +251,6 @@ int ApplicationDemo::Draw()
 	// Unbind
 	m_ground->Unbind();
 
-	//// Render for Light
-
 	// Update material
 	m_sign->Bind();
 	//m_signMat->ApplyUniformVec3("ambientMat", { 0, 0, 0 }); // { 0, 0.5f, 1 });
@@ -244,7 +260,6 @@ int ApplicationDemo::Draw()
 	m_sign->Render();
 	// Unbind
 	m_sign->Unbind();
-
 
 	//// Render for Light
 	//m_light->Bind();
@@ -268,20 +283,24 @@ int ApplicationDemo::Draw()
 	// Unbind
 	m_spear->Unbind();
 
+	m_emitter->Draw((float)glfwGetTime(),
+		m_camera->GetLocalMatrix(),
+		projView);
+
 	// Unbind RenderTarget
 	m_renderTarget1->Unbind();
 
-	// Update material
-	m_mirror->Bind();
-	//m_mirrorMat->ApplyUniformVec3("ambientMat", { 1, 1, 1 });
-	//m_mirrorMat->ApplyUniformMat4("projectionViewMatrix", projView);
-	//m_mirrorMat->ApplyUniformMat4("modelMatrix", m_mirror->m_transform.GetLocalMatrix());
-	float move = (float)glfwGetTime();// / 1000.0 * 2 * 3.14159 * .75;
-	m_mirrorMat->ApplyUniformFloat("distortTime", move);
-	// Render
-	m_mirror->Render();
-	// Unbind
-	m_mirror->Unbind();
+	//// Update material
+	//m_mirror->Bind();
+	////m_mirrorMat->ApplyUniformVec3("ambientMat", { 1, 1, 1 });
+	////m_mirrorMat->ApplyUniformMat4("projectionViewMatrix", projView);
+	////m_mirrorMat->ApplyUniformMat4("modelMatrix", m_mirror->m_transform.GetLocalMatrix());
+	//float move = (float)glfwGetTime();// / 1000.0 * 2 * 3.14159 * .75;
+	////m_mirrorMat->ApplyUniformFloat("distortTime", move);
+	//// Render
+	//m_mirror->Render();
+	//// Unbind
+	//m_mirror->Unbind();
 
 	return 0;
 }

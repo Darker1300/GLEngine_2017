@@ -20,6 +20,7 @@ RenderTarget::~RenderTarget()
 {
 	delete m_colour;
 	delete m_depth;
+	if (m_frameBufferID != -1) glDeleteFramebuffers(1, &m_frameBufferID);
 }
 
 RenderTarget::RenderTarget(RenderTarget && _other)
@@ -62,32 +63,12 @@ void RenderTarget::Unbind()
 	glViewport(0, 0, GLE::APP->GetWindowWidth(), GLE::APP->GetWindowHeight());
 }
 
-unsigned int RenderTarget::CreateTexture2D(const int w, const int h, int internalFormat, unsigned int format, unsigned int type)
-{
-	GLuint textureId;
-	glGenTextures(1, &textureId);
-	glBindTexture(GL_TEXTURE_2D, textureId);
-	//NOTE: You should use GL_NEAREST here. Other values can cause problems
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	if (GL_DEPTH_COMPONENT == format) {
-		//sample like regular texture, value is in all channels
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-		// glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_INTENSITY);
-	}
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, format, type, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	return textureId;
-}
-
-bool RenderTarget::CreateFBO(const int w, const int h)
+bool RenderTarget::CreateFBO(const int _width, const int _height)
 {
 	bool result = false;
 	//generate textures for FBO usage. You could use other formats here, e.g. GL_RGBA8 for color
-	m_colour->m_id = CreateTexture2D(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-	m_depth->m_id = CreateTexture2D(w, h, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT);
+	m_colour->CreateTexture(_width, _height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+	m_depth->CreateTexture(_width, _height, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT);
 	//generate and bind FBO
 	glGenFramebuffers(1, &m_frameBufferID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferID);

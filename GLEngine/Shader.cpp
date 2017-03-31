@@ -18,16 +18,12 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragPath)
 
 Shader::~Shader()
 {
-	if (m_programID != -1) {
-		glDeleteProgram(m_programID);
-	}
+	if (m_programID != -1) glDeleteProgram(m_programID);
 }
 
 Shader::Shader(Shader && _other)
 {
-	if (m_programID != -1) {
-		glDeleteProgram(m_programID);
-	}
+	if (m_programID != -1) glDeleteProgram(m_programID);
 
 	m_programID = _other.m_programID;
 	_other.m_programID = -1;
@@ -43,7 +39,7 @@ void Shader::MakeShaderProgram(const std::string & _vertexPath, const std::strin
 	glAttachShader(m_programID, m_fragmentShaderID);
 	glLinkProgram(m_programID);
 
-	TestCompilation();
+	TestCompilation(m_programID);
 }
 
 unsigned int Shader::MakeShader(unsigned int _type, const std::string & _path)
@@ -58,19 +54,19 @@ unsigned int Shader::MakeShader(unsigned int _type, const std::string & _path)
 	return shaderID;
 }
 
-void Shader::TestCompilation()
+void Shader::TestCompilation(unsigned int _programID)
 {
 	int success = GL_FALSE;
-	glGetProgramiv(m_programID, GL_LINK_STATUS, &success);
+	glGetProgramiv(_programID, GL_LINK_STATUS, &success);
 	if (success == GL_FALSE)
 	{
 		// DEBUG_LOG
 		int infoLogLength = 0;
-		glGetProgramiv(m_programID, GL_INFO_LOG_LENGTH, &infoLogLength);
+		glGetProgramiv(_programID, GL_INFO_LOG_LENGTH, &infoLogLength);
 		char* infoLog = new char[infoLogLength];
-		glGetProgramInfoLog(m_programID, infoLogLength, 0, infoLog);
+		glGetProgramInfoLog(_programID, infoLogLength, 0, infoLog);
 		// Log error
-		LOG_ERROR("Failed to link shader program ", m_programID, ".\n", infoLog);
+		LOG_ERROR("Failed to link shader program ", _programID, ".\n", infoLog);
 
 		delete[] infoLog;
 	}

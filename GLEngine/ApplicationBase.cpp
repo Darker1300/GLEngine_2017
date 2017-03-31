@@ -24,7 +24,7 @@ void ApplicationBase::Run()
 {
 	static double second = 1.0f;
 	m_targetFPS = 60.0;
-	m_fixedDTInterval = second * m_targetFPS;
+	m_fixedDTInterval = second / m_targetFPS;
 
 	double lastTime = glfwGetTime(), timer = lastTime;
 	double deltaTime = 0, fixedDeltaTime = 0, nowTime = 0;

@@ -28,18 +28,13 @@ public:
 	Transform();
 	~Transform();
 
-	//const glm::vec3& GetScale() const { return scale; }
-	//inline const float& GetPitch() const { return pitch; }
-	//inline const float& GetYaw() const { return yaw; }
-	//inline const float& GetRoll() const { return roll; }
-	//const glm::vec3& GetPosition() const { return position; }
-
 	// X:Yaw, Y:Pitch, Z:Roll. Rotated in following order: X, Y, Z
 	glm::mat4 GetRotationMatrix();
 	glm::mat4 GetLocalMatrix();
 
-	void SetRotation(const glm::vec3& _rotation) { SetRoll(_rotation[2]); SetYaw(_rotation[0]); SetPitch(_rotation[1]); };
+	void SetRotation(const glm::vec3& _rotation) { SetYaw(_rotation[0]); SetPitch(_rotation[1]); SetRoll(_rotation[2]); };
 	void AddRotation(const glm::vec3& _rotation) { SetRotation(forward + _rotation); };
+	
 	inline void SetPitch(float _radians) { pitch = ClampRadian(_radians); }
 	inline void SetYaw(float _radians) { yaw = ClampRadian(_radians); }
 	inline void SetRoll(float _radians) { roll = ClampRadian(_radians); }

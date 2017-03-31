@@ -11,6 +11,7 @@ class Transform;
 class RenderableObject;
 class Light;
 class RenderTarget;
+class ParticleSystem;
 
 #include "ApplicationBase.h"
 #include <vector>
@@ -66,6 +67,8 @@ protected:
 	RenderableObject* m_spear;
 	RenderableObject* m_mirror;
 	RenderableObject* m_light;
+
+	ParticleSystem* m_emitter;
 
 	Light* m_lightAlpha;
 };

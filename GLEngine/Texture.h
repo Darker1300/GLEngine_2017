@@ -24,10 +24,13 @@ public:
 	int GetHeight() const { return m_height; }
 	int GetFormat() const { return m_format; }
 	const unsigned char* const GetData() const { return m_data; }
-	//const std::string& GetPath() const { return m_path; }
 #pragma endregion Getters
 
 	void LoadTexture(const std::string& _path, const bool _flipY = true);
+	/// <summary>	'internalFormat': eg: GL_RED, GL_RG, GL_RGB, GL_RGBA
+	///	<para>		'format': eg: GL_DEPTH_COMPONENT, GL_RED, GL_RG, GL_RGB, GL_RGBA, GL_STENCIL_INDEX, GL_DEPTH_STENCIL
+	///</para>		'type' eg: GL_UNSIGNED_BYTE </summary>
+	void CreateTexture(const int _width, const int _height, int _internalFormat, unsigned int _format, unsigned int _type);
 
 private:
 	unsigned int m_id;
@@ -37,6 +40,4 @@ private:
 
 	unsigned char* m_data;
 	bool m_flipY;
-
-	//std::string m_path;
 };
