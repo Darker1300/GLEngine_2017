@@ -5,6 +5,7 @@
 
 #include <gl_core_4_4.h>
 #include <glm/glm.hpp>
+#include <glm/ext.hpp>
 #include "RenderData.h"
 #include "tiny_obj_loader.h"
 
@@ -109,19 +110,16 @@ namespace GeometryHelper {
 
 	RenderData * CreateFullscreenQuad(const float _windowWidth, const float _windowHeight)
 	{
-		RenderData* renderData = new RenderData();
-		renderData->GenerateBuffers(false);
-
 		std::vector<OBJVertex> vertexData;
 		vertexData.reserve(6);
 		for (int i = 0; i < 6; i++) vertexData.push_back(OBJVertex());
 
-		vertexData[0].position	= glm::vec4(-1,	-1,	0,	1);
-		vertexData[1].position	= glm::vec4( 1,	 1,	0,	1);
-		vertexData[2].position	= glm::vec4(-1,	 1,	0,	1);
-		vertexData[3].position	= glm::vec4(-1,	-1,	0,	1);
-		vertexData[4].position	= glm::vec4( 1,	-1,	0,	1);
-		vertexData[5].position	= glm::vec4( 1,	 1,	0,	1);
+		vertexData[0].position = glm::vec4(-1, -1, 0, 1);
+		vertexData[1].position = glm::vec4(1, 1, 0, 1);
+		vertexData[2].position = glm::vec4(-1, 1, 0, 1);
+		vertexData[3].position = glm::vec4(-1, -1, 0, 1);
+		vertexData[4].position = glm::vec4(1, -1, 0, 1);
+		vertexData[5].position = glm::vec4(1, 1, 0, 1);
 
 		glm::vec2 halfTexel = 1.0f / glm::vec2(_windowWidth, _windowHeight) * 0.5f;
 		vertexData[0].uv = glm::vec2(halfTexel.x, halfTexel.y);
@@ -131,6 +129,9 @@ namespace GeometryHelper {
 		vertexData[4].uv = glm::vec2(1 - halfTexel.x, halfTexel.y);
 		vertexData[5].uv = glm::vec2(1 - halfTexel.x, 1 - halfTexel.y);
 
+		RenderData* renderData = new RenderData();
+		renderData->GenerateBuffers(false);
+
 		CalculateTangents(vertexData);
 
 		renderData->FillVertexBuffer(&vertexData[0], 6);
@@ -139,6 +140,71 @@ namespace GeometryHelper {
 		renderData->SetFloatAttributePointer(2, 4, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::normal));
 		renderData->SetFloatAttributePointer(3, 4, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::tangent));
 		renderData->SetFloatAttributePointer(4, 4, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::bitangent));
+		renderData->Unbind();
+
+		return renderData;
+	}
+
+	RenderData * CreateSphere(const float _radius, const unsigned int _rings, const unsigned int _sectors)
+	{
+		std::vector<OBJVertex> vertices;
+		std::vector<unsigned int> indices;
+
+#pragma region Generate Mesh
+
+		float const R = 1.f / (float)(_rings - 1);
+		float const S = 1.f / (float)(_sectors - 1);
+		float const pi = glm::pi<float>();
+		float const piHalf = glm::half_pi<float>();
+		int r, s;
+
+		vertices.resize(_rings * _sectors * 3);
+		std::vector<OBJVertex>::iterator v = vertices.begin();
+		for (r = 0; r < (int)_rings; r++) for (s = 0; s < (int)_sectors; s++) {
+			float const y = sin(-piHalf + pi * r * R);
+			float const x = cos(2 * pi * s * S) * sin(pi * r * R);
+			float const z = sin(2 * pi * s * S) * sin(pi * r * R);
+
+			// Position
+			glm::vec4 position = glm::vec4(x * _radius, y * _radius, z * _radius, 1);
+			v->position = position;
+
+			// Texture Co-ord
+			v->uv = glm::vec2(s*S, r*R);
+
+			// Normal
+			v->normal = glm::vec4(x, y, z, 0);
+			v++;
+		}
+
+		// Indices
+		indices.resize(_rings * _sectors * 4);
+		std::vector<unsigned int>::iterator i = indices.begin();
+		for (r = 0; r < (int)_rings - 1; r++) for (s = 0; s < (int)_sectors - 1; s++) {
+			*i++ = r * _sectors + s;
+			*i++ = r * _sectors + (s + 1);
+			*i++ = (r + 1) * _sectors + (s + 1);
+			*i++ = (r + 1) * _sectors + s;
+		}
+
+#pragma endregion Generate Mesh
+
+		RenderData* renderData = new RenderData();
+		renderData->GenerateBuffers(true);
+
+		CalculateTangents(vertices);
+
+		renderData->FillIndexBuffer(&indices[0], indices.size());
+		renderData->FillVertexBuffer(&vertices[0], vertices.size());
+
+		renderData->SetFloatAttributePointer(0, 4, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::position));
+		renderData->SetFloatAttributePointer(1, 2, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::uv));
+		renderData->SetFloatAttributePointer(2, 4, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::normal));
+		renderData->SetFloatAttributePointer(3, 4, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::tangent));
+		renderData->SetFloatAttributePointer(4, 4, sizeof(OBJVertex), offsetof(OBJVertex, OBJVertex::bitangent));
+		
+		renderData->SetPrimitiveType(GL_QUADS);
+
 		renderData->Unbind();
 
 		return renderData;
@@ -204,7 +270,7 @@ namespace GeometryHelper {
 			renderData->GenerateBuffers(false);
 			renderData->Bind();
 
-			renderData->SetIndicesSize(vertices.size());
+			renderData->SetIndicesSize((UINT)vertices.size());
 
 			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(OBJVertex), vertices.data(), GL_STATIC_DRAW);
 

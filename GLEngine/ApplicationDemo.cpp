@@ -11,12 +11,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-#include "ShaderProgram.h"
-#include "ShaderCollection.h"
-#include "Mesh.h"
-#include "Primatives.h"
 #include "Texture.h"
-
 #include "Shader.h"
 #include "RenderData.h"
 #include "GeometryHelper.h"
@@ -56,11 +51,17 @@ int ApplicationDemo::Start()
 	m_basicShader = new Shader("./shaders/basicOBJ.vert", "./shaders/basicOBJ.frag");
 	m_tintTexShader = new Shader("./shaders/ian.vert", "./shaders/ian.frag");
 	m_phongShader = new Shader("./shaders/phongOBJ.vert", "./shaders/phongOBJ.frag");
-	m_depthTargetShader = new Shader("./shaders/depthTarget.vert", "./shaders/depthTarget.frag");
+	m_depthTargetShader = new Shader("./shaders/effects/depthTarget.vert", "./shaders/effects/depthTarget.frag");
+	m_bloomShader = new Shader("./shaders/effects/bloom.vert", "./shaders/effects/bloom.frag");
 
 	// Textures
 	m_texWhite = new Texture("./textures/white.png");
-	m_texSignDiffuse = new Texture("./textures/ian.png");
+
+	m_texGroundDiffuse = new Texture("./textures/metal1/161_diffuse.png");
+	m_texGroundSpecular = new Texture("./textures/metal1/161_spec.png");
+	m_texGroundNormal = new Texture("./textures/metal1/161_norm.png");
+
+	m_texSignDiffuse = new Texture("./textures/matt.png");
 	m_texSpearDiffuse = new Texture("./models/soulspear/soulspear_diffuse.tga");
 	m_texSpearSpecular = new Texture("./models/soulspear/soulspear_specular.tga");
 	m_texSpearNormal = new Texture("./models/soulspear/soulspear_normal.tga");
@@ -73,6 +74,7 @@ int ApplicationDemo::Start()
 	m_signRenderData = GeometryHelper::CreatePlane(2, 2, 4, 2);
 	m_spearRenderData = GeometryHelper::LoadOBJFromDisk("./models/soulspear/soulspear.obj"); //stanford/dragon
 	m_mirrorRenderData = GeometryHelper::CreatePlane(2, 2, 4, 4);
+	m_sphereRenderData = GeometryHelper::CreateSphere(2, 16, 16);
 
 	// fullscreen quad
 	m_screenRenderData = GeometryHelper::CreateFullscreenQuad((float)GLE::APP->GetWindowWidth(), (float)GLE::APP->GetWindowHeight());
@@ -81,12 +83,13 @@ int ApplicationDemo::Start()
 	m_groundMat = new Material(m_phongShader);
 	m_spearMat = new Material(m_phongShader);
 	m_signMat = new Material(m_tintTexShader);
-	m_mirrorMat = new Material(m_depthTargetShader);
+	m_mirrorMat = new Material(m_bloomShader);
+	m_lightObjMat = new Material(m_depthTargetShader);
 
 	// Set Textures
-	m_groundMat->m_textures["normalMap"] = m_texWhite;
-	m_groundMat->m_textures["diffuseMap"] = m_texWhite;
-	m_groundMat->m_textures["specularMap"] = m_texWhite;
+	m_groundMat->m_textures["normalMap"] = m_texGroundDiffuse;
+	m_groundMat->m_textures["diffuseMap"] = m_texGroundSpecular;
+	m_groundMat->m_textures["specularMap"] = m_texGroundNormal;
 
 	m_signMat->m_textures["diffuseMap"] = m_texSignDiffuse;
 
@@ -97,11 +100,15 @@ int ApplicationDemo::Start()
 	m_mirrorMat->m_textures["depthMap"] = m_renderTarget1->m_depth;
 	m_mirrorMat->m_textures["colourMap"] = m_renderTarget1->m_colour;
 
+	m_lightObjMat->m_textures["depthMap"] = m_renderTarget1->m_depth;
+	m_lightObjMat->m_textures["colourMap"] = m_renderTarget1->m_colour;
+
 	// RenderableObjects
 	m_ground = new RenderableObject(m_groundMat, std::vector<RenderData*>{ m_groundRenderData });
 	m_sign = new RenderableObject(m_signMat, std::vector<RenderData*>{ m_signRenderData });
 	m_spear = new RenderableObject(m_spearMat, m_spearRenderData);
 	m_mirror = new RenderableObject(m_mirrorMat, std::vector<RenderData*>{m_screenRenderData});
+	m_light = new RenderableObject(m_lightObjMat, std::vector<RenderData*>{m_sphereRenderData});
 
 	m_lightAlpha = new Light();
 
@@ -112,7 +119,7 @@ int ApplicationDemo::Start()
 	//m_sign->m_transform.SetParent(&m_spear->m_transform);
 	m_ground->m_transform.AddPitch(3.14159265f * 0.5f);
 	//m_sign->m_transform.AddPitch(3.14159265f * -0.5f);
-	//m_sign->m_transform.AddYaw(3.14159265f * 1.0f);
+	m_sign->m_transform.AddYaw(3.14159265f * 1.0f);
 	m_sign->m_transform.position += Vector3::up * 10; //.Translate(m_sign->m_transform.Up() * 10);
 
 	m_mirror->m_transform.position += Vector3::up * 2;
@@ -129,16 +136,19 @@ int ApplicationDemo::Shutdown()
 
 	delete m_lightAlpha;
 
+	delete m_light;
 	delete m_mirror;
 	delete m_spear;
 	delete m_sign;
 	delete m_ground;
 
+	delete m_lightObjMat;
 	delete m_mirrorMat;
 	delete m_signMat;
 	delete m_spearMat;
 	delete m_groundMat;
 
+	delete m_sphereRenderData;
 	delete m_screenRenderData;
 	delete m_mirrorRenderData;
 	for (auto data : m_spearRenderData) delete data;
@@ -146,6 +156,10 @@ int ApplicationDemo::Shutdown()
 	delete m_groundRenderData;
 
 	delete m_renderTarget1;
+
+	delete m_texGroundDiffuse;
+	delete m_texGroundSpecular;
+	delete m_texGroundNormal;
 
 	delete m_texSpearNormal;
 	delete m_texSpearSpecular;
@@ -155,6 +169,7 @@ int ApplicationDemo::Shutdown()
 
 	delete m_texWhite;
 
+	delete m_bloomShader;
 	delete m_depthTargetShader;
 	delete m_phongShader;
 	delete m_tintTexShader;
@@ -211,8 +226,14 @@ int ApplicationDemo::Draw()
 	m_groundMat->ApplyUniformVec3("lightDir", lightDir);
 	// Render
 	m_ground->Render();
+
+	m_groundMat->ApplyUniformMat4("modelMatrix", m_lightAlpha->m_transform.GetLocalMatrix());
+	m_sphereRenderData->Render();
+
 	// Unbind
 	m_ground->Unbind();
+
+	//// Render for Light
 
 	// Update material
 	m_sign->Bind();
@@ -221,15 +242,18 @@ int ApplicationDemo::Draw()
 	m_signMat->ApplyUniformMat4("modelMatrix", m_sign->m_transform.GetLocalMatrix());
 	// Render
 	m_sign->Render();
-
-	// Render second for Light
-	m_signMat->ApplyUniformMat4("modelMatrix", m_lightAlpha->m_transform.GetLocalMatrix());
-	// Render
-	m_sign->Render();
-
 	// Unbind
 	m_sign->Unbind();
 
+
+	//// Render for Light
+	//m_light->Bind();
+	//m_lightObjMat->ApplyUniformMat4("projectionViewMatrix", projView);
+	//m_lightObjMat->ApplyUniformMat4("modelMatrix", m_lightAlpha->m_transform.GetLocalMatrix());
+	//// Render
+	//m_light->Render();
+	//// Unbind
+	//m_light->Unbind();
 
 	// Update material
 	m_spear->Bind();

@@ -96,11 +96,10 @@ bool RenderTarget::CreateFBO(const int w, const int h)
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depth->m_id, 0);
 	//check if FBO was created ok
 	if (GL_FRAMEBUFFER_COMPLETE == glCheckFramebufferStatus(GL_FRAMEBUFFER)) {
-		printf("FBO %d set up successfully. Yay!\n", m_frameBufferID);
 		result = true;
 	}
 	else {
-		printf("FBO %d NOT set up properly!\n", m_frameBufferID);
+		LOG_ERROR("Render Target ", m_frameBufferID, " is set up incorrectly.");
 	}
 	//unbind FBO for now
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

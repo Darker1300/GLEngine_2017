@@ -35,11 +35,13 @@ protected:
 	Shader* m_tintTexShader;
 	Shader* m_phongShader;
 	Shader* m_depthTargetShader;
+	Shader* m_bloomShader;
 
 	Texture* m_texWhite;
-
+	Texture* m_texGroundDiffuse;
+	Texture* m_texGroundSpecular;
+	Texture* m_texGroundNormal;
 	Texture* m_texSignDiffuse;
-
 	Texture* m_texSpearDiffuse;
 	Texture* m_texSpearSpecular;
 	Texture* m_texSpearNormal;
@@ -51,16 +53,19 @@ protected:
 	std::vector<RenderData*> m_spearRenderData;
 	RenderData* m_mirrorRenderData;
 	RenderData* m_screenRenderData;
+	RenderData* m_sphereRenderData;
 
 	Material* m_groundMat;
 	Material* m_signMat;
 	Material* m_spearMat;
 	Material* m_mirrorMat;
+	Material* m_lightObjMat;
 
 	RenderableObject* m_ground;
 	RenderableObject* m_sign;
 	RenderableObject* m_spear;
 	RenderableObject* m_mirror;
+	RenderableObject* m_light;
 
 	Light* m_lightAlpha;
 };

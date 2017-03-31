@@ -15,4 +15,3 @@ public:
 	Transform m_transform;
 	glm::vec3 m_colour;
 };
-

@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Shaders">
-      <UniqueIdentifier>{c977990a-29e0-48e1-8423-eb29db4e1c42}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Debug">
       <UniqueIdentifier>{f1a6b6a1-41fd-48ed-809a-ab201bba5e79}</UniqueIdentifier>
     </Filter>
@@ -24,9 +21,6 @@
     </Filter>
     <Filter Include="Header Files\GL">
       <UniqueIdentifier>{1545c864-b7d3-440c-9b59-37ac93e9d407}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Shaders">
-      <UniqueIdentifier>{9a10a60e-6514-45fd-9c21-5132880b5eb3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\GL">
       <UniqueIdentifier>{0b48b988-da34-47d7-a5a6-87db86e51cf8}</UniqueIdentifier>
@@ -59,15 +53,6 @@
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Primatives.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ShaderProgram.cpp">
-      <Filter>Source Files\Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="ShaderCollection.cpp">
-      <Filter>Source Files\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="RenderData.cpp">
       <Filter>Source Files\GL</Filter>
@@ -121,15 +106,6 @@
     </ClInclude>
     <ClInclude Include="Mesh.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Primatives.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderProgram.h">
-      <Filter>Header Files\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderCollection.h">
-      <Filter>Header Files\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="RenderData.h">
       <Filter>Header Files\GL</Filter>

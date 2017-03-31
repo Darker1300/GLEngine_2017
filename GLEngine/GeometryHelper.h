@@ -25,6 +25,7 @@ namespace GeometryHelper
 	RenderData* CreatePlane(const unsigned int _rows, const unsigned int _cols, const float _width, const float _height);
 	RenderData* CreateQuad();
 	RenderData* CreateFullscreenQuad(const float _windowWidth, const float _windowHeight);
+	RenderData* CreateSphere(const float _radius, const unsigned int _rings, const unsigned int _sectors);
 
 	std::vector<RenderData*> LoadOBJFromDisk(const std::string& _path);
 	void CalculateTangents(std::vector<OBJVertex>& vertices);

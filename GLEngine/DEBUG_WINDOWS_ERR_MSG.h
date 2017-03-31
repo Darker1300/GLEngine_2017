@@ -9,17 +9,17 @@
 // Debug, Windows & Not Overridden
 #include <Windows.h>
 #include <sstream>
-#define LOG_ERROR(...) DEBUG_LOG::PrintWindErrorMsg(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__);
+#define LOG_ERROR(...) {DEBUG_LOG::PrintWindErrorMsg(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__);}
 
 #elif defined(_DEBUG) && (USE_CONSOLE_LOG == true)
 // Debug
 #include <sstream>
 #include <iostream>
-#define LOG_ERROR(...) DEBUG_LOG::PrintErrorMsg(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__);
+#define LOG_ERROR(...) {DEBUG_LOG::PrintErrorMsg(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__);}
 
 #else
 // Release
-#define LOG_ERROR(...)
+#define LOG_ERROR(...) {}
 
 #endif
 

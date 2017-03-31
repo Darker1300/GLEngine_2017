@@ -16,7 +16,7 @@ public:
 	void FillVertexBuffer(T* _first, unsigned _count);
 	void FillIndexBuffer(unsigned int* _first, unsigned _count);
 
-	void SetFloatAttributePointer(unsigned _slot, unsigned _floatCount, unsigned _vertexSize, unsigned _vertexMemberOffset);
+	void SetFloatAttributePointer(unsigned int _slot, unsigned int _floatCount, unsigned int _vertexSize, unsigned int _vertexMemberOffset);
 
 	void Render() const;
 	void Bind() const;
@@ -52,7 +52,8 @@ private:
 template<typename T>
 inline void RenderData::FillVertexBuffer(T * _first, unsigned _count)
 {
-	SetIndicesSize(_count);
+	if (!m_hasIndexBuffer)
+		SetIndicesSize(_count);
 	// Bind
 	Bind();
 	// Send Vertices

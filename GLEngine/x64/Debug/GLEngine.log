@@ -1,0 +1,35 @@
+﻿  VertexArray.cpp
+c:\users\s171380\documents\glengine_2017\glengine\vertexarray.cpp(3): fatal error C1083: Cannot open include file: 'gl_core_4_4.h': No such file or directory
+  Transform.cpp
+c:\users\s171380\documents\glengine_2017\glengine\transform.h(2): fatal error C1083: Cannot open include file: 'glm\glm.hpp': No such file or directory
+  Texture.cpp
+c:\users\s171380\documents\glengine_2017\glengine\texture.cpp(6): fatal error C1083: Cannot open include file: 'gl_core_4_4.h': No such file or directory
+  ShaderProgram.cpp
+c:\users\s171380\documents\glengine_2017\glengine\shaderprogram.cpp(6): fatal error C1083: Cannot open include file: 'gl_core_4_4.h': No such file or directory
+  ShaderCollection.cpp
+c:\users\s171380\documents\glengine_2017\glengine\shadercollection.h(2): fatal error C1083: Cannot open include file: 'glm\glm.hpp': No such file or directory
+  Shader.cpp
+c:\users\s171380\documents\glengine_2017\glengine\shader.cpp(7): fatal error C1083: Cannot open include file: 'gl_core_4_4.h': No such file or directory
+  RenderableObject.cpp
+c:\users\s171380\documents\glengine_2017\glengine\transform.h(2): fatal error C1083: Cannot open include file: 'glm\glm.hpp': No such file or directory
+  RenderTarget.cpp
+c:\users\s171380\documents\glengine_2017\glengine\rendertarget.cpp(6): fatal error C1083: Cannot open include file: 'gl_core_4_4.h': No such file or directory
+  RenderData.cpp
+c:\users\s171380\documents\glengine_2017\glengine\renderdata.cpp(6): fatal error C1083: Cannot open include file: 'gl_core_4_4.h': No such file or directory
+  Mesh.cpp
+c:\users\s171380\documents\glengine_2017\glengine\mesh.h(2): fatal error C1083: Cannot open include file: 'glm\glm.hpp': No such file or directory
+  Material.cpp
+c:\users\s171380\documents\glengine_2017\glengine\material.h(5): fatal error C1083: Cannot open include file: 'glm\glm.hpp': No such file or directory
+  Light.cpp
+c:\users\s171380\documents\glengine_2017\glengine\transform.h(2): fatal error C1083: Cannot open include file: 'glm\glm.hpp': No such file or directory
+  Gizmos.cpp
+c:\users\s171380\documents\glengine_2017\glengine\gizmos.h(3): fatal error C1083: Cannot open include file: 'glm/fwd.hpp': No such file or directory
+  GeometryHelper.cpp
+c:\users\s171380\documents\glengine_2017\glengine\geometryhelper.h(3): fatal error C1083: Cannot open include file: 'glm/vec2.hpp': No such file or directory
+  Camera.cpp
+c:\users\s171380\documents\glengine_2017\glengine\camera.h(3): fatal error C1083: Cannot open include file: 'glm\glm.hpp': No such file or directory
+  ApplicationDemo.cpp
+c:\users\s171380\documents\glengine_2017\glengine\applicationdemo.cpp(7): fatal error C1083: Cannot open include file: 'stb_image.h': No such file or directory
+  ApplicationBase.cpp
+c:\users\s171380\documents\glengine_2017\glengine\applicationbase.cpp(6): fatal error C1083: Cannot open include file: 'gl_core_4_4.h': No such file or directory
+  Generating Code...

@@ -8,7 +8,7 @@
 #include <GlFW/glfw3.h>
 #include <iostream>
 #include <fstream>
-
+#include <sstream>
 
 Shader::Shader(const std::string& vertexPath, const std::string& fragPath)
 	: m_programID(-1)
