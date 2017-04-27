@@ -45,9 +45,6 @@
     <ClCompile Include="Gizmos.cpp">
       <Filter>Source Files\Dependencies</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RenderData.cpp">
       <Filter>Source Files\GL</Filter>
     </ClCompile>
@@ -58,12 +55,6 @@
       <Filter>Source Files\GL</Filter>
     </ClCompile>
     <ClCompile Include="Transform.cpp">
-      <Filter>Source Files\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexArray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Loader.cpp">
       <Filter>Source Files\GL</Filter>
     </ClCompile>
     <ClCompile Include="GeometryHelper.cpp">
@@ -101,9 +92,6 @@
     <ClInclude Include="DEBUG_WINDOWS_ERR_MSG.h">
       <Filter>Header Files\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="RenderData.h">
       <Filter>Header Files\GL</Filter>
     </ClInclude>
@@ -117,12 +105,6 @@
       <Filter>Header Files\GL</Filter>
     </ClInclude>
     <ClInclude Include="Transform.h">
-      <Filter>Header Files\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader.h">
       <Filter>Header Files\GL</Filter>
     </ClInclude>
     <ClInclude Include="GeometryHelper.h">
