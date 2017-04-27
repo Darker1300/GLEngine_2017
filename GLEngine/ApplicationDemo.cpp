@@ -232,7 +232,7 @@ int ApplicationDemo::Draw()
 	glm::vec3 lightDir = m_lightAlpha->GetDirection(m_camera->position);
 
 	// Bind RenderTarget
-	m_renderTarget1->Bind();
+	//m_renderTarget1->Bind();
 
 	// Update material
 	m_ground->Bind();
@@ -288,7 +288,7 @@ int ApplicationDemo::Draw()
 		projView);
 
 	// Unbind RenderTarget
-	m_renderTarget1->Unbind();
+	//m_renderTarget1->Unbind();
 
 	//// Update material
 	//m_mirror->Bind();
