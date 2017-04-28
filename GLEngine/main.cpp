@@ -1,7 +1,6 @@
 #include "DEBUG_NEW_LEAK_DETECT.h"
-#define USE_CONSOLE_LOG true
 
-#include "ApplicationDemo.h"
+#include "Core.h"
 
 int main()
 {
@@ -9,9 +8,9 @@ int main()
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	ApplicationBase* app = new ApplicationDemo();
-	app->Run();
-	delete app;
+	Core::Initialize();
+	Core::Run();
+	Core::Finalize();
 
 #if _DEBUG
 	_CrtDumpMemoryLeaks();
