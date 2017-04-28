@@ -7,6 +7,7 @@
 
 #include <gl_core_4_4.h>
 #include <GlFW/glfw3.h>
+#include <glm/glm.hpp>
 
 
 void TimeKeeper::Initialize()
@@ -50,7 +51,7 @@ float TimeKeeper::FPS() const
 
 unsigned int TimeKeeper::iFPS() const
 {
-	return (unsigned int)ceilf(m_FPS);
+	return (unsigned int)glm::ceil(m_FPS);
 }
 
 void TimeKeeper::SetTimeScale(float _timeScale)

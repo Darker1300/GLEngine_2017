@@ -19,6 +19,16 @@ void Core::Initialize()
 	WindowEngine::Initialize();
 }
 
+void Core::Finalize()
+{
+	if (ENGINE::CORE == nullptr) LOG_ERROR("Failed to Finalize Core.");
+
+	WindowEngine::Finalize();
+	TimeKeeper::Finalize();
+
+	delete ENGINE::CORE;
+}
+
 void Core::Run()
 {
 	// FPS TIMER
@@ -36,22 +46,12 @@ void Core::Run()
 		}
 
 		// FPS TIMER
-		fpsTimer += ENGINE::TIME->DeltaTime(); while (fpsTimer >= 0.1) { fpsTimer -= 0.1; printf(("FPS: " + std::to_string(ENGINE::TIME->iFPS()) + +"\n").c_str()); }
+		fpsTimer += ENGINE::TIME->DeltaTime(); while (fpsTimer >= 0.1f) { fpsTimer -= 0.1f; printf(("FPS: " + std::to_string(ENGINE::TIME->iFPS()) + +"\n").c_str()); }
 		// ---------
 
 		// Window Events
 		ENGINE::WINDOW->Core_EndFrame();
 	}
-}
-
-void Core::Finalize()
-{
-	if (ENGINE::CORE == nullptr) LOG_ERROR("Failed to Finalize Core.");
-
-	WindowEngine::Finalize();
-	TimeKeeper::Finalize();
-
-	delete ENGINE::CORE;
 }
 
 Core::Core()

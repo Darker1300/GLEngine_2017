@@ -4,8 +4,8 @@ class Core
 {
 public:
 	static void Initialize();
-	static void Run();
 	static void Finalize();
+	static void Run();
 
 protected:
 	Core();
