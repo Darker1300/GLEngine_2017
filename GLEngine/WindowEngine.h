@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <string>
@@ -8,10 +9,8 @@ class WindowEngine
 {
 	friend class Core;
 	friend class RenderEngine;
-public:
-	static void Initialize();
-	static void Finalize();
 
+public:
 	GLFWwindow* Window() const;
 	std::string Title() const;
 	unsigned int Width() const;
@@ -19,9 +18,12 @@ public:
 	float AspectRatio() const;
 
 	void SetTitle(const char* _title);
-	void SetSize(unsigned int _width, unsigned int _height);
+	void SetWindowSize(unsigned int _width, unsigned int _height);
 
 protected:
+	static void Initialize();
+	static void Finalize();
+
 	WindowEngine();
 	~WindowEngine();
 
@@ -32,11 +34,16 @@ protected:
 	bool CreateOGLWindow();
 	void DestroyOGLWindow();
 
-	static void WindowSizeCallback(GLFWwindow* _window, int _width, int _height);
+	unsigned int FrameBufferWidth() const;
+	unsigned int FrameBufferHeight() const;
+
+	static void WindowResizeCallback(GLFWwindow* _window, int _width, int _height);
+	static void FrameBufferResizeCallback(GLFWwindow* _window, int _width, int _height);
 
 	GLFWwindow* m_window; 
 	std::string m_title;
-	unsigned int m_width;
-	unsigned int m_height;
-	bool m_sizeChanged;
+	unsigned int m_windowWidth;
+	unsigned int m_windowHeight;
+	unsigned int m_framebufferWidth;
+	unsigned int m_framebufferHeight;
 };

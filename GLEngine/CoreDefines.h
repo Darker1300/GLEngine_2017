@@ -5,10 +5,10 @@ class TimeKeeper;
 class RenderEngine;
 class WindowEngine;
 class InputEngine;
-class ResourceEngine;
+class AssetEngine;
 class SceneEngine;
-class CameraEngine;
-class LightEngine;
+class CameraManager;
+class LightManager;
 
 namespace ENGINE
 {
@@ -17,8 +17,8 @@ namespace ENGINE
 	extern RenderEngine* RENDER;
 	extern WindowEngine* WINDOW;
 	extern InputEngine* INPUT;
-	extern ResourceEngine* RESOURCE;
+	extern AssetEngine* ASSETS;
 	extern SceneEngine* SCENES;
-	extern CameraEngine* CAMERAS;
-	extern LightEngine* LIGHTS;
+	extern CameraManager* CAMERAS;
+	extern LightManager* LIGHTS;
 }

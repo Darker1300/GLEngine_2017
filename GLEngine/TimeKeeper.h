@@ -3,10 +3,8 @@
 class TimeKeeper
 {
 	friend class Core;
-public:
-	static void Initialize();
-	static void Finalize();
 
+public:
 	float FixedDeltaTime() const;
 	float DeltaTime() const;
 	///<summary>Time at current Frame.</summary>
@@ -23,6 +21,10 @@ public:
 	void SetFUPS(unsigned int _fups);
 
 protected:
+
+	static void Initialize();
+	static void Finalize();
+
 	TimeKeeper();
 	~TimeKeeper();
 

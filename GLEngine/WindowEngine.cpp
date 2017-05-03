@@ -1,3 +1,4 @@
+
 #include "WindowEngine.h"
 
 #include "DEBUG_NEW_LEAK_DETECT.h"
@@ -9,31 +10,41 @@
 #include <glfw\glfw3.h>
 
 
-WindowEngine::WindowEngine()
-	: m_window()
-	, m_title()
-	, m_width()
-	, m_height()
-	, m_sizeChanged(true)
+GLFWwindow * WindowEngine::Window() const
 {
+	return m_window;
 }
 
-WindowEngine::~WindowEngine()
+std::string WindowEngine::Title() const
 {
+	return m_title;
 }
 
-void WindowEngine::Core_EndFrame()
+unsigned int WindowEngine::Width() const
 {
-	// Gather Window Inputs
-	glfwPollEvents();
-	// Refresh Screen size
-	if (m_sizeChanged)
-		glViewport(0, 0, m_width, m_height);
+	return m_windowWidth;
 }
 
-bool WindowEngine::Core_ShouldWindowClose()
+unsigned int WindowEngine::Height() const
 {
-	return glfwWindowShouldClose(m_window);
+	return m_windowHeight;
+}
+
+float WindowEngine::AspectRatio() const
+{
+	return (float)m_windowWidth / (float)m_windowHeight;
+}
+
+void WindowEngine::SetTitle(const char * _title)
+{
+	glfwSetWindowTitle(m_window, _title);
+}
+
+void WindowEngine::SetWindowSize(unsigned int _width, unsigned int _height)
+{
+	m_windowWidth = _width;
+	m_windowHeight = _height;
+	glfwSetWindowSize(m_window, m_windowWidth, m_windowHeight);
 }
 
 void WindowEngine::Initialize()
@@ -42,9 +53,10 @@ void WindowEngine::Initialize()
 
 	ENGINE::WINDOW = new WindowEngine();
 
-	ENGINE::WINDOW->SetSize(800, 600);
+	ENGINE::WINDOW->SetWindowSize(800, 600);
 	ENGINE::WINDOW->CreateOGLWindow();
-	glfwSetWindowSizeCallback(ENGINE::WINDOW->m_window, WindowSizeCallback);
+	glfwSetWindowSizeCallback(ENGINE::WINDOW->m_window, WindowResizeCallback);
+	glfwSetFramebufferSizeCallback(ENGINE::WINDOW->m_window, FrameBufferResizeCallback);
 }
 
 void WindowEngine::Finalize()
@@ -54,6 +66,33 @@ void WindowEngine::Finalize()
 	ENGINE::WINDOW->DestroyOGLWindow();
 
 	delete ENGINE::WINDOW;
+}
+
+WindowEngine::WindowEngine()
+	: m_window()
+	, m_title()
+	, m_windowWidth()
+	, m_windowHeight()
+	, m_framebufferWidth()
+	, m_framebufferHeight()
+{
+}
+
+WindowEngine::~WindowEngine()
+{
+}
+
+void WindowEngine::Core_EndFrame()
+{
+	// Swap Buffers
+	glfwSwapBuffers(m_window);
+	// Gather Window Inputs
+	glfwPollEvents();
+}
+
+bool WindowEngine::Core_ShouldWindowClose()
+{
+	return glfwWindowShouldClose(m_window) != 0;
 }
 
 bool WindowEngine::InitialiseOGLFunctions()
@@ -76,7 +115,7 @@ bool WindowEngine::CreateOGLWindow()
 			return false;
 	}
 	// Create Window
-	m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
+	m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, m_title.c_str(), nullptr, nullptr);
 	if (m_window == false) return false;
 
 	// Create Context
@@ -85,7 +124,7 @@ bool WindowEngine::CreateOGLWindow()
 	// Load Functions
 	InitialiseOGLFunctions();
 
-	// Set Defaults
+	// Set Defaults. TODO MOVE TO RENDERENGINE
 	glEnable(GL_DEPTH);
 	glEnable(GL_DEPTH_TEST);
 
@@ -101,47 +140,24 @@ void WindowEngine::DestroyOGLWindow()
 	glfwTerminate();
 }
 
-void WindowEngine::WindowSizeCallback(GLFWwindow * _window, int _width, int _height)
+unsigned int WindowEngine::FrameBufferWidth() const
 {
-	ENGINE::WINDOW->m_width = _width;
-	ENGINE::WINDOW->m_height = _height;
-	ENGINE::WINDOW->m_sizeChanged = true;
+	return m_framebufferWidth;
 }
 
-GLFWwindow * WindowEngine::Window() const
+unsigned int WindowEngine::FrameBufferHeight() const
 {
-	return m_window;
+	return m_framebufferHeight;
 }
 
-std::string WindowEngine::Title() const
+void WindowEngine::WindowResizeCallback(GLFWwindow * _window, int _width, int _height)
 {
-	return m_title;
+	ENGINE::WINDOW->m_windowWidth = _width;
+	ENGINE::WINDOW->m_windowHeight = _height;
 }
 
-unsigned int WindowEngine::Width() const
+void WindowEngine::FrameBufferResizeCallback(GLFWwindow * _window, int _width, int _height)
 {
-	return m_width;
-}
-
-unsigned int WindowEngine::Height() const
-{
-	return m_height;
-}
-
-float WindowEngine::AspectRatio() const
-{
-	return (float)m_width / (float)m_height;
-}
-
-void WindowEngine::SetTitle(const char * _title)
-{
-	glfwSetWindowTitle(m_window, _title);
-}
-
-void WindowEngine::SetSize(unsigned int _width, unsigned int _height)
-{
-	m_width = _width;
-	m_height = _height;
-	glfwSetWindowSize(m_window, m_width, m_height);
-	m_sizeChanged = true;
+	ENGINE::WINDOW->m_framebufferWidth = _width;
+	ENGINE::WINDOW->m_framebufferHeight = _height;
 }

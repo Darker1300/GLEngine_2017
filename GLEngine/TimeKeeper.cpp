@@ -13,7 +13,6 @@
 void TimeKeeper::Initialize()
 {
 	if (ENGINE::TIME != nullptr) LOG_ERROR("Attempted to Initialize TimeKeeper multiple times.");
-
 	ENGINE::TIME = new TimeKeeper();
 }
 
