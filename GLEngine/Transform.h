@@ -1,55 +1,47 @@
 #pragma once
-#include <glm\glm.hpp>
-#include <glm\gtx\quaternion.hpp>
-#include <list>
 
-namespace Vector3 {
-	// 0, 0, -1
-	extern const glm::vec3 backward;
-	// 0, 0, 1
-	extern const glm::vec3 forward;
-	// 0, 1, 0
-	extern const glm::vec3 up;
-	// 0, -1, 0
-	extern const glm::vec3 down;
-	// 1, 0, 0
-	extern const glm::vec3 right;
-	// -1, 0, 0
-	extern const glm::vec3 left;
-	// 1, 1, 1
-	extern const glm::vec3 one;
-	// 0, 0, 0
-	extern const glm::vec3 zero;
-}
+#include "glm/vec3.hpp"
+#include "glm/gtc/quaternion.hpp"
 
 class Transform
 {
 public:
+	Transform(const glm::vec3& _position, const glm::quat& _rotation, const glm::vec3& _scale);
+	Transform(const glm::vec3& _position, const glm::quat& _rotation);
+	Transform(const glm::vec3& _position);
 	Transform();
-	~Transform();
+	Transform(const Transform& _other);	// Copy constructor
+	Transform& operator = (const Transform& _other);	// Copy assignment
 
-	// X:Yaw, Y:Pitch, Z:Roll. Rotated in following order: X, Y, Z
-	glm::mat4 GetRotationMatrix();
-	glm::mat4 GetLocalMatrix();
+	glm::vec3 Position() const;
+	glm::quat Rotation() const;
+	glm::vec3 EulerAngles() const;
+	glm::vec3 Scale() const;
 
-	void SetRotation(const glm::vec3& _rotation) { SetYaw(_rotation[0]); SetPitch(_rotation[1]); SetRoll(_rotation[2]); };
-	void AddRotation(const glm::vec3& _rotation) { SetRotation(forward + _rotation); };
-	
-	inline void SetPitch(float _radians) { pitch = ClampRadian(_radians); }
-	inline void SetYaw(float _radians) { yaw = ClampRadian(_radians); }
-	inline void SetRoll(float _radians) { roll = ClampRadian(_radians); }
+	glm::vec3 Forward() const;
+	glm::vec3 Right() const;
+	glm::vec3 Up() const;
 
-	inline void AddPitch(float _radians) { SetPitch(pitch + _radians); }
-	inline void AddYaw(float _radians) { SetYaw(yaw + _radians); }
-	inline void AddRoll(float _radians) { SetRoll(roll + _radians); }
+	glm::mat4 Matrix() const;
 
-	inline static float ClampRadian(const float& _value) { return fmodf(_value, glm::two_pi<float>()); }
+	void SetPosition(const glm::vec3& position);
+	void SetRotation(const glm::quat& rotation);
+	void SetEulerAngles(const glm::vec3& rotation);
+	void SetScale(const glm::vec3& scale);
 
-	glm::vec3 scale;
-	union {
-		// Radians. X:Yaw, Y:Pitch, Z:Roll. Rotated in following order: X, Y, Z
-		glm::vec3 forward;
-		struct { float yaw, pitch, roll; };
-	};
-	glm::vec3 position;
+	void LookAt(const glm::vec3& _lookTarget);
+
+	void Translate(const glm::vec3& _position);
+	void Rotate(const glm::quat& _rotation);
+
+	void RotateTowards(const glm::quat& _to, float _maxRadiansStep);
+	void RotateTowards(const glm::vec3& _lookTarget, float _maxRadiansStep);
+
+private:
+	glm::vec3 m_position;
+	glm::quat m_rotation;
+	glm::vec3 m_scale;
+
+	static glm::quat RotateTowards(glm::quat _from, const glm::quat& _to, float _maxRadiansStep);
+	static glm::quat LookAt(const glm::vec3& _from, const glm::vec3& _to);
 };

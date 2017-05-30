@@ -189,6 +189,8 @@
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="TimeKeeper.cpp" />
     <ClCompile Include="tiny_obj_loader.cc" />
+    <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="WindowEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -210,6 +212,8 @@
     <ClInclude Include="SceneNode.h" />
     <ClInclude Include="TimeKeeper.h" />
     <ClInclude Include="tiny_obj_loader.h" />
+    <ClInclude Include="Transform.h" />
+    <ClInclude Include="Vector3.h" />
     <ClInclude Include="WindowEngine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -3,49 +3,173 @@
 
 #include "Transform.h"
 
+#include "Vector3.h"
 #include <glm\gtx\transform.hpp>
-//#include <glm/gtx/quaternion.hpp>
-//#include <glm/gtc/quaternion.hpp>
-//#include <glm\ext.hpp>
 
-static const glm::vec3 Vector3::forward = glm::vec3(0, 0, 1);
-static const glm::vec3 Vector3::backward = glm::vec3(0, 0, -1);
-static const glm::vec3 Vector3::up = glm::vec3(0, 1, 0);
-static const glm::vec3 Vector3::down = glm::vec3(0, -1, 0);
-static const glm::vec3 Vector3::right = glm::vec3(1, 0, 0);
-static const glm::vec3 Vector3::left = glm::vec3(-1, 0, 0);
-static const glm::vec3 Vector3::one = glm::vec3(1, 1, 1);
-static const glm::vec3 Vector3::zero = glm::vec3(0, 0, 0);
+Transform::Transform(const glm::vec3 & _position, const glm::quat & _rotation, const glm::vec3 & _scale)
+	: m_position(_position)
+	, m_rotation(_rotation)
+	, m_scale(_scale)
+{
+}
+
+Transform::Transform(const glm::vec3 & _position, const glm::quat & _rotation)
+	: Transform(_position, _rotation, Vector3::one)
+{
+}
+
+Transform::Transform(const glm::vec3 & _position)
+	: Transform(_position, glm::quat(), Vector3::one)
+{
+}
 
 Transform::Transform()
-	: scale(1), forward(), position()
+	: Transform(Vector3::zero, glm::quat(), Vector3::one)
 {
 }
 
-Transform::~Transform()
+Transform::Transform(const Transform & _other)
+	: m_position(_other.m_position)
+	, m_rotation(_other.m_rotation)
+	, m_scale(_other.m_scale)
 {
 }
 
-glm::mat4 Transform::GetRotationMatrix()
+Transform & Transform::operator=(const Transform & _other)
 {
-	glm::mat4 rotMat = glm::mat4();
-	// rotate around to a given bearing: yaw
-	rotMat = glm::rotate(rotMat, yaw, Vector3::up);
-	// rotate around to a given bearing: pitch
-	rotMat = glm::rotate(rotMat, pitch, Vector3::right);
-	// rotate around to a given bearing: roll
-	rotMat = glm::rotate(rotMat, roll, Vector3::forward);
-	return rotMat;
+	m_position = _other.m_position;
+	m_rotation = _other.m_rotation;
+	m_scale = _other.m_scale;
+	return *this;
 }
 
-glm::mat4 Transform::GetLocalMatrix()
+glm::vec3 Transform::Position() const
 {
-	glm::mat4 local = glm::mat4();
-	// translate
-	local = glm::translate(local, position);
-	// rotate
-	local = local * GetRotationMatrix();
-	// scale
-	local = glm::scale(local, scale);
-	return local;
+	return m_position;
+}
+
+glm::quat Transform::Rotation() const
+{
+	return m_rotation;
+}
+
+glm::vec3 Transform::EulerAngles() const
+{
+	return glm::eulerAngles(m_rotation);
+}
+
+glm::vec3 Transform::Scale() const
+{
+	return m_scale;
+}
+
+glm::vec3 Transform::Forward() const
+{
+	return glm::normalize(m_rotation * glm::vec3(0, 0, 1));
+}
+
+glm::vec3 Transform::Right() const
+{
+	return glm::normalize(m_rotation * glm::vec3(1, 0, 0));
+}
+
+glm::vec3 Transform::Up() const
+{
+	return glm::normalize(m_rotation * glm::vec3(0, 1, 0));
+}
+
+glm::mat4 Transform::Matrix() const
+{
+	return glm::translate(m_position) * glm::mat4_cast(m_rotation) * glm::scale(m_scale);
+}
+
+void Transform::SetPosition(const glm::vec3 & position)
+{
+	m_position = position;
+}
+
+void Transform::SetRotation(const glm::quat & rotation)
+{
+	m_rotation = rotation;
+}
+
+void Transform::SetEulerAngles(const glm::vec3 & rotation)
+{
+	m_rotation = glm::quat(rotation);
+}
+
+void Transform::SetScale(const glm::vec3 & scale)
+{
+	m_scale = scale;
+}
+
+void Transform::LookAt(const glm::vec3 & _lookTarget)
+{
+	m_rotation = LookAt(m_position, _lookTarget);
+}
+
+void Transform::Translate(const glm::vec3 & _position)
+{
+	m_position += _position;
+}
+
+void Transform::Rotate(const glm::quat & _rotation)
+{
+	m_rotation = _rotation * m_rotation;
+}
+
+void Transform::RotateTowards(const glm::quat & _to, float _maxRadiansStep)
+{
+	m_rotation = RotateTowards(m_rotation, _to, _maxRadiansStep);
+}
+
+void Transform::RotateTowards(const glm::vec3 & _lookTarget, float _maxRadiansStep)
+{
+	m_rotation = RotateTowards(m_rotation, LookAt(m_position, _lookTarget), _maxRadiansStep);
+}
+
+glm::quat Transform::RotateTowards(glm::quat _from, const glm::quat & _to, float _maxRadiansStep) {
+
+	if (_maxRadiansStep < 0.001f) {
+		// No rotation allowed. Prevent dividing by 0 later.
+		return _from;
+	}
+
+	float cosTheta = glm::dot(_from, _to);
+
+	// _from and _to are already equal.
+	// Force _to just to be sure
+	if (cosTheta > 0.9999f) {
+		return _to;
+	}
+
+	// Avoid taking the long path around the sphere
+	if (cosTheta < 0) {
+		_from = _from * -1.0f;
+		cosTheta *= -1.0f;
+	}
+
+	float angle = glm::acos(cosTheta);
+
+	// If there is only a 2&deg; difference, and we are allowed 5&deg;,
+	// then we arrived.
+	if (angle < _maxRadiansStep) {
+		return _to;
+	}
+
+	float fT = _maxRadiansStep / angle;
+	angle = _maxRadiansStep;
+
+	glm::quat res = (glm::sin((1.0f - fT) * angle) * _from + glm::sin(fT * angle) * _to) / glm::sin(angle);
+	res = glm::normalize(res);
+	return res;
+
+}
+
+glm::quat Transform::LookAt(const glm::vec3 & _from, const glm::vec3 & _to)
+{
+	glm::mat4 viewMat = glm::lookAt(_from, _to, Vector3::up);
+	glm::mat4 worldMat = glm::inverse(viewMat);
+
+	return glm::quat_cast(worldMat);
 }
