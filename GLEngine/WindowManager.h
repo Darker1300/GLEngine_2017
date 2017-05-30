@@ -5,12 +5,15 @@
 
 struct GLFWwindow;
 
-class WindowEngine
+class WindowManager
 {
 	friend class Core;
 	friend class RenderEngine;
 
 public:
+	WindowManager();
+	~WindowManager();
+
 	GLFWwindow* Window() const;
 	std::string Title() const;
 	unsigned int Width() const;
@@ -21,12 +24,6 @@ public:
 	void SetWindowSize(unsigned int _width, unsigned int _height);
 
 protected:
-	static void Initialize();
-	static void Finalize();
-
-	WindowEngine();
-	~WindowEngine();
-
 	void Core_EndFrame();
 	bool Core_ShouldWindowClose();
 

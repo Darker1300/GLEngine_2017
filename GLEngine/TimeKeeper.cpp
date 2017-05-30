@@ -3,7 +3,7 @@
 #include "DEBUG_NEW_LEAK_DETECT.h"
 #include "DEBUG_WINDOWS_ERR_MSG.h"
 
-#include "CoreDefines.h"
+#include "EngineDefines.h"
 
 #include <gl_core_4_4.h>
 #include <GlFW/glfw3.h>
@@ -12,15 +12,15 @@
 
 void TimeKeeper::Initialize()
 {
-	if (ENGINE::TIME != nullptr) LOG_ERROR("Attempted to Initialize TimeKeeper multiple times.");
-	ENGINE::TIME = new TimeKeeper();
+	if (ENGINE::TIME() != nullptr) LOG_ERROR("Attempted to Initialize TimeKeeper multiple times.");
+	ENGINE::_internals::TIME = new TimeKeeper();
 }
 
 void TimeKeeper::Finalize()
 {
-	if (ENGINE::TIME == nullptr) LOG_ERROR("Failed to Finalize TimeKeeper.");
+	if (ENGINE::TIME() == nullptr) LOG_ERROR("Failed to Finalize TimeKeeper.");
 
-	delete ENGINE::TIME;
+	delete ENGINE::TIME();
 }
 
 float TimeKeeper::FixedDeltaTime() const

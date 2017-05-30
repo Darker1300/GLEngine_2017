@@ -173,48 +173,50 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\deps\gl_core_4_4\gl_core_4_4.c" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraManager.cpp" />
+    <ClCompile Include="Component.cpp" />
     <ClCompile Include="Core.cpp" />
-    <ClCompile Include="CoreDefines.cpp" />
+    <ClCompile Include="EngineDefines.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Gizmos.cpp" />
     <ClCompile Include="InputEngine.cpp" />
-    <ClCompile Include="IRenderable.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="AssetEngine.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneEngine.cpp" />
-    <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="TimeKeeper.cpp" />
     <ClCompile Include="tiny_obj_loader.cc" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Vector3.cpp" />
-    <ClCompile Include="WindowEngine.cpp" />
+    <ClCompile Include="WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraManager.h" />
-    <ClInclude Include="IComponent.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="ComponentManager.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="DEBUG_WINDOWS_ERR_MSG.h" />
     <ClInclude Include="DEBUG_NEW_LEAK_DETECT.h" />
-    <ClInclude Include="CoreDefines.h" />
+    <ClInclude Include="EngineDefines.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Gizmos.h" />
     <ClInclude Include="InputEngine.h" />
-    <ClInclude Include="IRenderable.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="AssetEngine.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneEngine.h" />
-    <ClInclude Include="SceneNode.h" />
     <ClInclude Include="TimeKeeper.h" />
     <ClInclude Include="tiny_obj_loader.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Vector3.h" />
-    <ClInclude Include="WindowEngine.h" />
+    <ClInclude Include="WindowManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

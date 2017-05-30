@@ -10,8 +10,8 @@ class SceneEngine
 	friend class Core;
 
 public:
-	Scene* At(unsigned int _Index) const;
-	Scene* Active() const;
+	Scene* const At(unsigned int _Index) const;
+	Scene* const Active() const;
 	int ActiveIndex() const;
 	int SceneCount() const;
 

@@ -3,19 +3,19 @@
 #include "DEBUG_NEW_LEAK_DETECT.h"
 #include "DEBUG_WINDOWS_ERR_MSG.h"
 
-#include "CoreDefines.h"
+#include "EngineDefines.h"
 
 #include "Scene.h"
 
 #include <algorithm>
 
 
-Scene * SceneEngine::At(unsigned int _Index) const
+Scene * const SceneEngine::At(unsigned int _Index) const
 {
 	return m_scenes[_Index];
 }
 
-Scene * SceneEngine::Active() const
+Scene * const SceneEngine::Active() const
 {
 	return m_scenes[m_currentIndex];
 }
@@ -32,7 +32,7 @@ int SceneEngine::SceneCount() const
 
 void SceneEngine::SetActive(const Scene * _scene)
 {
-	LOG_ERROR("TODO"); // SetActive(_scene->buildIndex);
+	SetActive(_scene->m_buildIndex);
 }
 
 void SceneEngine::SetActive(int _index)
@@ -63,19 +63,23 @@ void SceneEngine::Clear()
 
 void SceneEngine::Initialize()
 {
-	if (ENGINE::SCENES != nullptr) LOG_ERROR("Attempted to Initialize SceneEngine multiple times.");
-	ENGINE::SCENES = new SceneEngine();
+	if (ENGINE::SCENES() != nullptr) LOG_ERROR("Attempted to Initialize SceneEngine multiple times.");
+	ENGINE::_internals::SCENES = new SceneEngine();
 
-	ENGINE::SCENES->m_currentIndex = 0;
+	Scene* sc = new Scene();
+	sc->m_name = "Main";
+
+	ENGINE::SCENES()->Add(sc);
+	ENGINE::SCENES()->m_currentIndex = 0;
 }
 
 void SceneEngine::Finalize()
 {
-	if (ENGINE::SCENES == nullptr) LOG_ERROR("Failed to Finalize SceneEngine.");
+	if (ENGINE::SCENES() == nullptr) LOG_ERROR("Failed to Finalize SceneEngine.");
 
-	ENGINE::SCENES->Clear();
+	ENGINE::SCENES()->Clear();
 
-	delete ENGINE::SCENES;
+	delete ENGINE::SCENES();
 }
 
 SceneEngine::SceneEngine()

@@ -83,24 +83,24 @@ glm::mat4 Transform::Matrix() const
 	return glm::translate(m_position) * glm::mat4_cast(m_rotation) * glm::scale(m_scale);
 }
 
-void Transform::SetPosition(const glm::vec3 & position)
+void Transform::SetPosition(const glm::vec3 & _position)
 {
-	m_position = position;
+	m_position = _position;
 }
 
-void Transform::SetRotation(const glm::quat & rotation)
+void Transform::SetRotation(const glm::quat & _rotation)
 {
-	m_rotation = rotation;
+	m_rotation = _rotation;
 }
 
-void Transform::SetEulerAngles(const glm::vec3 & rotation)
+void Transform::SetEulerAngles(const glm::vec3 & _rotation)
 {
-	m_rotation = glm::quat(rotation);
+	m_rotation = glm::quat(_rotation);
 }
 
-void Transform::SetScale(const glm::vec3 & scale)
+void Transform::SetScale(const glm::vec3 & _scale)
 {
-	m_scale = scale;
+	m_scale = _scale;
 }
 
 void Transform::LookAt(const glm::vec3 & _lookTarget)

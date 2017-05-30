@@ -24,10 +24,10 @@ public:
 
 	glm::mat4 Matrix() const;
 
-	void SetPosition(const glm::vec3& position);
-	void SetRotation(const glm::quat& rotation);
-	void SetEulerAngles(const glm::vec3& rotation);
-	void SetScale(const glm::vec3& scale);
+	void SetPosition(const glm::vec3& _position);
+	void SetRotation(const glm::quat& _rotation);
+	void SetEulerAngles(const glm::vec3& _rotation);
+	void SetScale(const glm::vec3& _scale);
 
 	void LookAt(const glm::vec3& _lookTarget);
 

@@ -2,19 +2,28 @@
 #pragma once
 
 #include <vector>
-
-class IComponent;
-class SceneNode;
+#include "Scene.h"
+#include "Transform.h"
+#include "ComponentManager.h"
 
 class GameObject
 {
+	friend class Scene;
+	friend class Component;
 public:
-	GameObject();
+	typedef ComponentManager<Component> ComponentsManager;
+
 	~GameObject();
 
-	void Update();
-	void Render();
+	template<typename T>
+	T* const CreateComponent();
+	void RemoveComponent(Component* _component);
+	void RemoveComponents();
 
-	SceneNode* m_sceneNode;
-	std::vector<IComponent*> m_components;
+	Transform transform;
+protected:
+	GameObject(Scene* const _scene);
+
+	Scene* m_scene;
+	ComponentsManager m_components;
 };
