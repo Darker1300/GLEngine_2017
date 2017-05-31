@@ -23,6 +23,7 @@ public:
 	glm::vec3 Up() const;
 
 	glm::mat4 Matrix() const;
+	glm::mat4 InverseMatrix() const;
 
 	void SetPosition(const glm::vec3& _position);
 	void SetRotation(const glm::quat& _rotation);
@@ -36,6 +37,9 @@ public:
 
 	void RotateTowards(const glm::quat& _to, float _maxRadiansStep);
 	void RotateTowards(const glm::vec3& _lookTarget, float _maxRadiansStep);
+
+	void RotateAround(const glm::vec3& _originPoint, const glm::vec3& _axis, const float _radians);
+	void MoveTowards(const glm::vec3& _targetPoint, const float _maxStep);
 
 private:
 	glm::vec3 m_position;

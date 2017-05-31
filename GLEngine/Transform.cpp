@@ -83,6 +83,11 @@ glm::mat4 Transform::Matrix() const
 	return glm::translate(m_position) * glm::mat4_cast(m_rotation) * glm::scale(m_scale);
 }
 
+glm::mat4 Transform::InverseMatrix() const
+{
+	return glm::inverse(Matrix());
+}
+
 void Transform::SetPosition(const glm::vec3 & _position)
 {
 	m_position = _position;
@@ -105,6 +110,7 @@ void Transform::SetScale(const glm::vec3 & _scale)
 
 void Transform::LookAt(const glm::vec3 & _lookTarget)
 {
+	if (_lookTarget == m_position) return;
 	m_rotation = LookAt(m_position, _lookTarget);
 }
 
@@ -126,6 +132,25 @@ void Transform::RotateTowards(const glm::quat & _to, float _maxRadiansStep)
 void Transform::RotateTowards(const glm::vec3 & _lookTarget, float _maxRadiansStep)
 {
 	m_rotation = RotateTowards(m_rotation, LookAt(m_position, _lookTarget), _maxRadiansStep);
+}
+
+void Transform::RotateAround(const glm::vec3 & _originPoint, const glm::vec3 & _axis, const float _radians)
+{
+	m_position = _originPoint + (glm::angleAxis(_radians, _axis) * (m_position - _originPoint));
+}
+
+void Transform::MoveTowards(const glm::vec3 & _targetPoint, const float _maxStep)
+{
+	glm::vec3 dir;
+
+	if (_targetPoint == m_position && glm::sign(_maxStep) <= 0.0f)
+		dir = -Forward();
+	else
+		dir = glm::normalize(_targetPoint - m_position);
+
+	glm::vec3 dist = (_targetPoint - m_position);
+	glm::vec3 step = glm::length(dist) > _maxStep ? _maxStep * dir : dist;
+	m_position += step;
 }
 
 glm::quat Transform::RotateTowards(glm::quat _from, const glm::quat & _to, float _maxRadiansStep) {
